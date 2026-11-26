@@ -40,7 +40,7 @@ export function DayStrip({ selected, today, marked = [] }: { selected: string; t
               key={d}
               onClick={() => go(d)}
               className={cn(
-                "flex flex-col items-center rounded-xl border bg-card/90 py-2 transition hover:border-primary/50",
+                "flex flex-col items-center rounded-xl border bg-card py-2 transition hover:border-primary/50",
                 active && "border-primary bg-primary text-primary-foreground hover:border-primary",
               )}
             >

@@ -1,4 +1,4 @@
-# Orbit CRM — one CRM, many projects
+# CRM — one CRM, many projects
 
 A multi-project CRM built with **Next.js 16**, **Tailwind CSS v4**, **shadcn/ui** and **Supabase**.
 Each project (a clinic, a client, a brand…) gets its own isolated CRM: pipeline, team, branches,
@@ -112,5 +112,5 @@ src/components/ui/        shadcn/ui components
 
 - **Cache Components** is enabled (the Next 16 default). Pages read the session inside
   `<Suspense>` boundaries, so the shell streams instantly and data fills in.
-- Rename the product by changing "Orbit CRM" in `src/components/brand.tsx` and `src/app/layout.tsx`.
+- Rename the product by changing "CRM" in `src/components/brand.tsx`, `src/components/site/site-header.tsx` (landing-page wordmark) and `src/app/layout.tsx`.
 - Each project's colour, logo and contact label ("Patients", "Clients"…) are set in **Settings → Project profile**.

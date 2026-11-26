@@ -35,10 +35,10 @@ export function LeadsTable({
   const name = (rows: { id: string; name: string }[], id: string | null, fallback = "—") => rows.find((r) => r.id === id)?.name ?? fallback;
 
   return (
-    <div className="overflow-hidden rounded-2xl border bg-card/90">
+    <div className="overflow-hidden rounded-md border bg-card shadow-xs">
       <Table>
         <TableHeader>
-          <TableRow className="text-xs uppercase">
+          <TableRow className="bg-muted/50 hover:bg-muted/50">
             <TableHead>Lead</TableHead>
             <TableHead>Phone</TableHead>
             <TableHead>Status</TableHead>
@@ -54,7 +54,7 @@ export function LeadsTable({
           {leads.map((l) => (
             <TableRow key={l.id}>
               <TableCell className="max-w-48">
-                <Link href={`/p/${slug}/leads/${l.id}`} className="block truncate font-semibold text-info hover:underline">
+                <Link href={`/p/${slug}/leads/${l.id}`} className="block truncate font-medium hover:text-info hover:underline">
                   {l.name}
                 </Link>
                 {l.enquiry_count > 1 && <span className="text-xs text-warning">{l.enquiry_count} enquiries</span>}

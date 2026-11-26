@@ -1,4 +1,4 @@
-import { PlusIcon } from "lucide-react";
+import { KanbanSquareIcon, ListIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -8,7 +8,7 @@ import { PageHeader } from "@/components/crm/page-header";
 import { RefreshButton } from "@/components/crm/refresh-button";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RANGE_OPTIONS, resolveRange } from "@/lib/dates";
+import { RANGE_OPTIONS, dayBounds, resolveRange, ymdInTz } from "@/lib/dates";
 import { clientLookups, getLookups, getProjectContext, type ProjectContext } from "@/lib/project";
 import type { Lead } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -31,10 +31,10 @@ export default function LeadsPage(props: Props) {
       fallback={
         <div className="space-y-4 pt-3">
           <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-20 rounded-2xl" />
+          <Skeleton className="h-20 rounded-lg" />
           <div className="grid gap-3 md:grid-cols-3">
             {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-96 rounded-2xl" />
+              <Skeleton key={i} className="h-96 rounded-lg" />
             ))}
           </div>
         </div>
@@ -67,6 +67,7 @@ async function Leads({ params, searchParams }: Props) {
   const view = sp.view === "list" ? "list" : "kanban";
   const now = new Date();
   const range = resolveRange(sp.range, ctx.tz, now);
+  const today = dayBounds(ymdInTz(now, ctx.tz), ctx.tz);
 
   const filters = (
     <FilterBar
@@ -106,7 +107,18 @@ async function Leads({ params, searchParams }: Props) {
       }),
     );
     total = columns.reduce((n, c) => n + c.count, 0);
-    body = <LeadsKanban slug={slug} tz={ctx.tz} lookups={cl} columns={columns} canDelete={ctx.canDelete} limit={KANBAN_LIMIT} />;
+    body = (
+      <LeadsKanban
+        slug={slug}
+        tz={ctx.tz}
+        lookups={cl}
+        columns={columns}
+        canDelete={ctx.canDelete}
+        limit={KANBAN_LIMIT}
+        nowIso={now.toISOString()}
+        todayEndIso={today.to.toISOString()}
+      />
+    );
   } else {
     const page = Math.max(1, Number(sp.page) || 1);
     let q = leadQuery(ctx, sp, range);
@@ -131,54 +143,50 @@ async function Leads({ params, searchParams }: Props) {
   return (
     <>
       <PageHeader
-        title="Lead Management"
+        title="Pipeline"
         description={`${total.toLocaleString("en-IN")} ${range.key === "all" ? "" : `${range.label.toLowerCase()} · `}leads`}
-        actions={<LeadActions ctx={ctx} cl={cl} view={view} qs={qs} />}
+        primary={
+          <LeadFormDialog
+            slug={ctx.project.slug}
+            tz={ctx.tz}
+            lookups={cl}
+            defaultStageId={sp.stage}
+            trigger={<Button>New</Button>}
+          />
+        }
+        search={filters}
+        actions={<ViewSwitcher view={view} qs={qs} />}
       />
-      {filters}
       {body}
     </>
   );
 }
 
-function LeadActions({
-  ctx,
-  cl,
-  view,
-  qs,
-}: {
-  ctx: ProjectContext;
-  cl: ReturnType<typeof clientLookups>;
-  view: "kanban" | "list";
-  qs: (p: Partial<SP>) => string;
-}) {
+function ViewSwitcher({ view, qs }: { view: "kanban" | "list"; qs: (p: Partial<SP>) => string }) {
+  const views = [
+    { key: "kanban", label: "Kanban", icon: KanbanSquareIcon },
+    { key: "list", label: "List", icon: ListIcon },
+  ] as const;
   return (
     <>
-      <div className="flex rounded-lg border bg-card p-0.5">
-        {(["kanban", "list"] as const).map((v) => (
+      <RefreshButton />
+      <div className="flex rounded-md border bg-card">
+        {views.map((v, i) => (
           <Link
-            key={v}
-            href={qs({ view: v === "kanban" ? undefined : v, page: undefined })}
+            key={v.key}
+            href={qs({ view: v.key === "kanban" ? undefined : v.key, page: undefined })}
+            aria-label={`${v.label} view`}
+            title={v.label}
             className={cn(
-              "rounded-md px-3 py-1 text-sm font-semibold capitalize transition",
-              view === v ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
+              "grid h-8 w-9 place-items-center text-muted-foreground transition hover:bg-muted hover:text-foreground",
+              i > 0 && "border-l",
+              view === v.key && "bg-secondary text-foreground",
             )}
           >
-            {v}
+            <v.icon className="size-4" />
           </Link>
         ))}
       </div>
-      <RefreshButton />
-      <LeadFormDialog
-        slug={ctx.project.slug}
-        tz={ctx.tz}
-        lookups={cl}
-        trigger={
-          <Button>
-            <PlusIcon /> Add lead
-          </Button>
-        }
-      />
     </>
   );
 }

@@ -20,9 +20,9 @@ export default function TodoPage(props: Props) {
       fallback={
         <div className="space-y-4 pt-3">
           <Skeleton className="h-10 w-56" />
-          <Skeleton className="h-20 rounded-2xl" />
+          <Skeleton className="h-20 rounded-lg" />
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-20 rounded-2xl" />
+            <Skeleton key={i} className="h-20 rounded-lg" />
           ))}
         </div>
       }

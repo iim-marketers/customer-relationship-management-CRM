@@ -27,8 +27,8 @@ export default function AppointmentsPage(props: Props) {
       fallback={
         <div className="space-y-4 pt-3">
           <Skeleton className="h-10 w-56" />
-          <Skeleton className="h-20 rounded-2xl" />
-          <Skeleton className="h-64 rounded-2xl" />
+          <Skeleton className="h-20 rounded-lg" />
+          <Skeleton className="h-64 rounded-lg" />
         </div>
       }
     >
@@ -104,16 +104,18 @@ async function Appointments({ params, searchParams }: Props) {
             />
           </>
         }
+        search={
+          <FilterBar
+            keep={["date"]}
+            filters={[
+              { key: "branch", label: "Branch", allLabel: "All branches", options: lookups.branches.map((b) => ({ value: b.id, label: b.name })) },
+              { key: "status", label: "Status", allLabel: "All statuses", options: APPOINTMENT_STATUSES },
+              { key: "assigned", label: "With", allLabel: "Everyone", options: cl.members.map((m) => ({ value: m.id, label: m.name })) },
+            ]}
+          />
+        }
       />
       <DayStrip selected={selected} today={today} marked={marked} />
-      <FilterBar
-        keep={["date"]}
-        filters={[
-          { key: "branch", label: "Branch", allLabel: "All branches", options: lookups.branches.map((b) => ({ value: b.id, label: b.name })) },
-          { key: "status", label: "Status", allLabel: "All statuses", options: APPOINTMENT_STATUSES },
-          { key: "assigned", label: "With", allLabel: "Everyone", options: cl.members.map((m) => ({ value: m.id, label: m.name })) },
-        ]}
-      />
       <Panel title={dayLabel} icon={CalendarCheckIcon} bodyClassName="p-2">
         {error ? (
           <EmptyState className="m-2">Couldn&apos;t load appointments: {error.message}</EmptyState>

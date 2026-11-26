@@ -1,5 +1,4 @@
 import {
-  ArrowLeftIcon,
   CalendarCheckIcon,
   CalendarPlusIcon,
   ClipboardListIcon,
@@ -17,6 +16,7 @@ import { Suspense } from "react";
 import { AppointmentBadge, CallBadge, StageBadge } from "@/components/crm/badges";
 import { AppointmentDialog } from "@/components/crm/dialogs/appointment-dialog";
 import { EmptyState, Panel } from "@/components/crm/panel";
+import { PageHeader } from "@/components/crm/page-header";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fmt, formatDuration, toZonedInput } from "@/lib/dates";
@@ -39,8 +39,8 @@ export default function ContactDetailPage({ params }: { params: Params }) {
         <div className="space-y-4 pt-3">
           <Skeleton className="h-10 w-72" />
           <div className="grid gap-4 lg:grid-cols-3">
-            <Skeleton className="h-64 rounded-2xl" />
-            <Skeleton className="h-64 rounded-2xl lg:col-span-2" />
+            <Skeleton className="h-64 rounded-lg" />
+            <Skeleton className="h-64 rounded-lg lg:col-span-2" />
           </div>
         </div>
       }
@@ -115,56 +115,54 @@ async function ContactDetail({ params }: { params: Params }) {
 
   return (
     <>
-      <Link href={`${base}/contacts`} className="mt-3 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeftIcon className="size-4" /> {ctx.project.contact_label}
-      </Link>
-
-      <div className="mt-2 mb-4 flex flex-wrap items-end justify-between gap-3">
-        <div className="min-w-0">
-          <div className="text-[11px] font-semibold tracking-widest text-muted-foreground uppercase">{singular}</div>
-          <h1 className="truncate text-2xl font-bold tracking-tight">{contact.name}</h1>
-          <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
+      <PageHeader
+        breadcrumbs={[{ label: ctx.project.contact_label, href: `${base}/contacts` }]}
+        title={contact.name}
+        description={
+          <span className="flex flex-wrap gap-x-4">
             {contact.phone && (
-              <a href={`tel:${contact.phone}`} className="inline-flex items-center gap-1.5 hover:text-foreground">
-                <PhoneIcon className="size-3.5" /> {contact.phone}
+              <a href={`tel:${contact.phone}`} className="inline-flex items-center gap-1 hover:text-foreground">
+                <PhoneIcon className="size-3" /> {contact.phone}
               </a>
             )}
             {contact.email && (
-              <a href={`mailto:${contact.email}`} className="inline-flex items-center gap-1.5 hover:text-foreground">
-                <MailIcon className="size-3.5" /> {contact.email}
+              <a href={`mailto:${contact.email}`} className="inline-flex items-center gap-1 hover:text-foreground">
+                <MailIcon className="size-3" /> {contact.email}
               </a>
             )}
-          </div>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <AppointmentDialog
-            slug={slug}
-            projectId={ctx.project.id}
-            contactLabel={ctx.project.contact_label}
-            lookups={client}
-            defaultWhen={toZonedInput(new Date(), ctx.tz).slice(0, 11) + "10:00"}
-            record={{ kind: "contact", id: contact.id, name: contact.name, phone: contact.phone }}
-            defaults={{ branch_id: contact.branch_id, service_id: contact.service_id, assigned_to: contact.assigned_to }}
-            trigger={
-              <Button>
-                <CalendarPlusIcon /> Book appointment
-              </Button>
-            }
-          />
-          <ContactFormDialog
-            slug={slug}
-            singular={singular}
-            lookups={client}
-            contact={contact}
-            trigger={
-              <Button variant="outline">
-                <PencilIcon /> Edit
-              </Button>
-            }
-          />
-          {ctx.canDelete && <DeleteContactButton slug={slug} contactId={contact.id} name={contact.name} />}
-        </div>
-      </div>
+          </span>
+        }
+        actions={
+          <>
+              <AppointmentDialog
+                slug={slug}
+                projectId={ctx.project.id}
+                contactLabel={ctx.project.contact_label}
+                lookups={client}
+                defaultWhen={toZonedInput(new Date(), ctx.tz).slice(0, 11) + "10:00"}
+                record={{ kind: "contact", id: contact.id, name: contact.name, phone: contact.phone }}
+                defaults={{ branch_id: contact.branch_id, service_id: contact.service_id, assigned_to: contact.assigned_to }}
+                trigger={
+                  <Button>
+                    <CalendarPlusIcon /> Book appointment
+                  </Button>
+                }
+              />
+              <ContactFormDialog
+                slug={slug}
+                singular={singular}
+                lookups={client}
+                contact={contact}
+                trigger={
+                  <Button variant="outline">
+                    <PencilIcon /> Edit
+                  </Button>
+                }
+              />
+              {ctx.canDelete && <DeleteContactButton slug={slug} contactId={contact.id} name={contact.name} />}
+          </>
+        }
+      />
 
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="flex flex-col gap-4">

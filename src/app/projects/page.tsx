@@ -1,4 +1,4 @@
-import { ArrowRightIcon, FolderKanbanIcon, LogOutIcon, ShieldAlertIcon } from "lucide-react";
+import { FolderKanbanIcon, LogOutIcon, ShieldAlertIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -18,7 +18,7 @@ export const metadata: Metadata = { title: "Your projects" };
 
 export default function ProjectsPage({ searchParams }: { searchParams: Promise<{ denied?: string }> }) {
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
       <header className="mb-10 flex items-center justify-between gap-4">
         <BrandMark />
         <div className="flex items-center gap-2">
@@ -54,7 +54,7 @@ async function ProjectList({ searchParams }: { searchParams: Promise<{ denied?: 
     <>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Your projects</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Your projects</h1>
           <p className="mt-1 text-muted-foreground">Signed in as {name}. Pick a CRM to open.</p>
         </div>
         <NewProjectDialog />
@@ -68,7 +68,7 @@ async function ProjectList({ searchParams }: { searchParams: Promise<{ denied?: 
       )}
 
       {rows.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed p-12 text-center">
+        <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed p-12 text-center">
           <FolderKanbanIcon className="size-10 text-muted-foreground" />
           <h2 className="text-lg font-semibold">No projects yet</h2>
           <p className="max-w-sm text-sm text-muted-foreground">
@@ -77,27 +77,22 @@ async function ProjectList({ searchParams }: { searchParams: Promise<{ denied?: 
           <NewProjectDialog />
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-3 gap-x-4 gap-y-8 rounded-xl border bg-card px-4 py-10 shadow-xs sm:grid-cols-4 lg:grid-cols-6">
           {rows.map(({ role, project }) => (
             <Link
               key={project.id}
               href={`/p/${project.slug}/dashboard`}
-              className="group flex flex-col gap-4 rounded-2xl border bg-card p-5 transition hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5"
+              title={`${project.name} · ${ROLE_LABELS[role]}${project.industry ? ` · ${industryLabel(project.industry)}` : ""}`}
+              className="group flex flex-col items-center gap-2 rounded-lg p-2 text-center outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <div className="flex items-center gap-3">
-                <ProjectLogo project={project} className="size-11" />
-                <div className="min-w-0">
-                  <div className="truncate font-semibold">{project.name}</div>
-                  <div className="truncate font-mono text-xs text-muted-foreground">/p/{project.slug}</div>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex gap-2">
-                  <Badge variant="secondary">{ROLE_LABELS[role]}</Badge>
-                  {project.industry && <Badge variant="outline">{industryLabel(project.industry)}</Badge>}
-                </div>
-                <ArrowRightIcon className="size-4 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-primary" />
-              </div>
+              <ProjectLogo
+                project={project}
+                className="size-16 rounded-2xl text-lg shadow-md transition group-hover:-translate-y-0.5 group-hover:shadow-lg sm:size-18"
+              />
+              <span className="line-clamp-2 text-sm font-medium">{project.name}</span>
+              <Badge variant="secondary" className="-mt-1 text-[10px]">
+                {ROLE_LABELS[role]}
+              </Badge>
             </Link>
           ))}
         </div>
@@ -112,7 +107,7 @@ function ProjectsSkeleton() {
       <Skeleton className="h-10 w-64" />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <Skeleton key={i} className="h-32 rounded-2xl" />
+          <Skeleton key={i} className="h-32 rounded-lg" />
         ))}
       </div>
     </div>

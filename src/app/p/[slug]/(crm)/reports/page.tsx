@@ -68,14 +68,13 @@ async function Reports({ params, searchParams }: { params: Params; searchParams:
   ];
 
   const header = (
-    <PageHeader title="Reports & Analytics" description={`Performance overview · ${range.label}`} />
+    <PageHeader title="Reports & Analytics" description={`Performance overview · ${range.label}`} search={<FilterBar filters={filters} />} />
   );
 
   if (error || !r) {
     return (
       <>
         {header}
-        <FilterBar filters={filters} />
         <EmptyState>Couldn&apos;t load the report{error ? `: ${error.message}` : ""}.</EmptyState>
       </>
     );
@@ -88,7 +87,6 @@ async function Reports({ params, searchParams }: { params: Params; searchParams:
   return (
     <>
       {header}
-      <FilterBar filters={filters} />
 
       <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard label="Conversion rate" value={percent(r.converted, r.total_leads)} hint="Leads converted" icon={ActivityIcon} tone="muted" />
@@ -227,15 +225,15 @@ function ReportsSkeleton() {
   return (
     <div className="space-y-4 pt-3">
       <Skeleton className="h-8 w-56" />
-      <Skeleton className="h-20 rounded-2xl" />
+      <Skeleton className="h-20 rounded-lg" />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-28 rounded-2xl" />
+          <Skeleton key={i} className="h-28 rounded-lg" />
         ))}
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
-        <Skeleton className="h-72 rounded-2xl" />
-        <Skeleton className="h-72 rounded-2xl" />
+        <Skeleton className="h-72 rounded-lg" />
+        <Skeleton className="h-72 rounded-lg" />
       </div>
     </div>
   );
