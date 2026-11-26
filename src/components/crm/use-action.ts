@@ -22,7 +22,6 @@ export function useAction() {
   return { pending, run };
 }
 
-// Avoids React's automatic form reset so inputs survive errors.
 export function onSubmitForm(fn: (fd: FormData) => unknown) {
   return (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

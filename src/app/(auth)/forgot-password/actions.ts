@@ -75,7 +75,6 @@ async function requestCode(prev: ForgotState, formData: FormData): Promise<Forgo
     .order("created_at", { ascending: false });
 
   const latest = recent?.[0] ? new Date(recent[0].created_at).getTime() : 0;
-  // A code went out moments ago: don't send another, but answer the same way.
   if (Date.now() - latest < RESEND_COOLDOWN_SECONDS * 1000) return { ...sent, sentAt: latest };
   if ((recent?.length ?? 0) >= MAX_CODES_PER_HOUR) {
     return back({ error: "Too many reset requests. Try again in an hour." });
@@ -183,7 +182,6 @@ async function resetPassword(prev: ForgotState, formData: FormData): Promise<For
   const done: ForgotState = { step: "done", message: "Your password has been updated. Sign in with your new password." };
   if (signInError) return done;
 
-  // Only returns if a branded project login refused this account.
   const projectSlug = String(formData.get("project") ?? "") || null;
   const { error: accessError } = await enterApp(supabase, data.user.id, projectSlug, null);
   return { ...done, message: `Your password has been updated, but ${accessError.charAt(0).toLowerCase()}${accessError.slice(1)}` };

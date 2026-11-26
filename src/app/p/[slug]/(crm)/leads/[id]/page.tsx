@@ -1,3 +1,4 @@
+import { io } from "next/cache";
 import {
   CalendarCheckIcon,
   ClipboardCheckIcon,
@@ -88,6 +89,7 @@ async function LeadDetail({ params }: Props) {
 
   const cl = clientLookups(lookups);
   const singular = project.contact_label.replace(/s$/, "");
+  await io();
   const now = new Date();
   const today = ymdInTz(now, tz);
   const nextHour = toZonedInput(new Date(now.getTime() + 3600_000), tz).slice(0, 14) + "00";

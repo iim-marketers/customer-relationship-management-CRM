@@ -42,14 +42,15 @@ export default function SignupPage() {
               "text-6xl leading-[0.95] xl:text-7xl short:text-5xl xl:short:text-6xl",
             )}
           >
-            Start a new CRM <span className="block text-[#f2645e]">in a minute</span>
+            Start a new CRM{" "}
+            <span className="block text-[#f2645e]">in a minute</span>
           </h1>
           <p className="mt-5 text-lg text-white/70 short:mt-3 short:text-base">
             Your pipeline, lead sources and first branch are set up for you.
             Invite your team when you&apos;re ready.
           </p>
-          <ul className="mt-10 space-y-5 short:mt-6 short:space-y-3">
-            {HIGHLIGHTS.map(({ id, icon: Icon, color, title, body }) => (
+          <ul className="mt-6 space-y-5 short:mt-6 short:space-y-3">
+            {HIGHLIGHTS.map(({ id, icon: Icon, color, title }) => (
               <li key={id} className="flex items-center gap-4">
                 <span
                   className="grid size-10 shrink-0 place-items-center rounded-lg shadow-lg ring-1 shadow-black/30 ring-white/15 short:size-8"
@@ -59,14 +60,12 @@ export default function SignupPage() {
                 </span>
                 <div>
                   <p className="font-semibold">{title}</p>
-                  <p className="text-sm text-white/60 short:hidden">{body}</p>
                 </div>
               </li>
             ))}
           </ul>
         </div>
 
-        {/* Balances the logo so the headline stays centred. */}
         <div aria-hidden className="h-8" />
       </aside>
 

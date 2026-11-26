@@ -1,3 +1,4 @@
+import { io } from "next/cache";
 import { PlusIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
@@ -42,6 +43,7 @@ async function Todo({ params, searchParams }: Props) {
   const { supabase, project, tz, user } = ctx;
   const lookups = await getLookups(slug);
 
+  await io();
   const now = new Date();
   const today = ymdInTz(now, tz);
   const selected = isYmd(sp.date) ? sp.date : today;

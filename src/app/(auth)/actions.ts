@@ -61,12 +61,11 @@ export async function signUp(_: AuthState, formData: FormData): Promise<AuthStat
   if (!process.env.SUPABASE_SECRET_KEY) return { error: MISSING_SECRET };
   if (await isUsernameTaken(username)) return { fieldErrors: { username: "That username is taken" } };
 
-  // Pre-confirmed so sign-up never waits on email verification, whatever the Supabase setting.
   const { error } = await createAdminClient().auth.admin.createUser({
     email,
     password,
     email_confirm: true,
-    // The on_auth_user_created trigger reads these to create the profile and the project.
+    // Read by the on_auth_user_created trigger to create the profile and the project.
     user_metadata: {
       full_name,
       username,
@@ -79,7 +78,6 @@ export async function signUp(_: AuthState, formData: FormData): Promise<AuthStat
     if (error.code === "email_exists" || /already (been )?registered/i.test(error.message)) {
       return { fieldErrors: { email: "An account with this email already exists. Sign in instead." } };
     }
-    // Likely a username race between our check and the insert.
     if (/database error/i.test(error.message)) {
       return { error: "Couldn't create your account. That username may have just been taken; try another." };
     }
@@ -138,19 +136,4 @@ export async function signOut(formData?: FormData) {
   await supabase.auth.signOut();
   const slug = formData?.get("project");
   redirect(typeof slug === "string" && slug ? `/p/${slug}/login` : "/login");
-}
-
-export type CreateProjectState = { error?: string } | undefined;
-
-export async function createProject(_: CreateProjectState, formData: FormData): Promise<CreateProjectState> {
-  const name = String(formData.get("name") ?? "").trim();
-  const industry = String(formData.get("industry") ?? "") || null;
-  if (name.length < 2) return { error: "Project name must be at least 2 characters" };
-
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .rpc("create_project", { p_name: name, p_industry: industry, p_contact_label: contactLabelFor(industry) })
-    .single<{ slug: string }>();
-  if (error) return { error: error.message };
-  redirect(`/p/${data.slug}/dashboard`);
 }

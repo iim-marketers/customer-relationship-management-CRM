@@ -1,9 +1,12 @@
 import "server-only";
 import { createServerClient } from "@supabase/ssr";
+import { io } from "next/cache";
 import { cookies } from "next/headers";
 
 export async function createClient() {
   const cookieStore = await cookies();
+  // supabase-js reads Date.now() to check token expiry, which can't run during a prerender.
+  await io();
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

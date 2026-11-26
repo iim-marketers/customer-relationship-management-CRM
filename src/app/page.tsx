@@ -167,7 +167,6 @@ export default function Home() {
   );
 }
 
-// Static mock of the Pipeline screen; keep in sync with app-shell, page-header, filter-bar and leads-kanban.
 
 type FollowUp = "overdue" | "today" | "planned" | "none";
 type SampleLead = {
@@ -183,7 +182,7 @@ type SampleLead = {
 
 const FOLLOW_UP: Record<FollowUp, { bar: string; icon: string }> = {
   planned: { bar: "bg-[#28a745]", icon: "text-[#28a745]" },
-  today: { bar: "bg-[#e99d00]", icon: "text-[#e99d00]" },
+  today: { bar: "bg-[#ea580c]", icon: "text-[#ea580c]" },
   overdue: { bar: "bg-[#d44c59]", icon: "text-[#d44c59]" },
   none: { bar: "bg-[#6b7280]/25", icon: "text-[#6b7280]/60" },
 };
@@ -192,7 +191,7 @@ const SOURCE_COLOR: Record<string, string> = {
   Website: "#d6145f",
   "Meta Ads": "#9365b8",
   Instagram: "#f06050",
-  "Google Ads": "#f4a460",
+  "Google Ads": "#5b6dd1",
   WhatsApp: "#30c381",
   Referral: "#2c8397",
   "Walk-in": "#475577",
@@ -357,7 +356,7 @@ function PipelineMockup() {
                           {l.source}
                         </span>
                         {l.repeat && (
-                          <span className="rounded-full bg-[#e99d00]/15 px-1.5 py-px text-[9.5px] font-medium text-[#b37800]">
+                          <span className="rounded-full bg-[#ea580c]/15 px-1.5 py-px text-[9.5px] font-medium text-[#c2410c]">
                             Repeat ×{l.repeat}
                           </span>
                         )}

@@ -15,7 +15,7 @@ async function run<T>(fn: () => Promise<ActionResult<T>>): Promise<ActionResult<
     if (result.ok) refresh();
     return result;
   } catch (e) {
-    unstable_rethrow(e); // let redirect()/notFound() through
+    unstable_rethrow(e);
     return { ok: false, error: e instanceof Error ? e.message : "Something went wrong" };
   }
 }
@@ -35,7 +35,6 @@ async function logActivity(ctx: Ctx, leadId: string, type: string, body: string)
   });
 }
 
-// Best-effort: projects can rename stages.
 async function moveLeadToStageLike(ctx: Ctx, leadId: string, pattern: string) {
   const { stages } = await getLookups(ctx.project.slug);
   const target = stages.find((s) => s.kind === "open" && s.name.toLowerCase().includes(pattern));

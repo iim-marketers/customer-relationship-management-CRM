@@ -67,11 +67,11 @@ export function ProfileSection({ project, isAdmin, isOwner }: { project: Project
               <input
                 type="color"
                 aria-label="Pick brand colour"
-                value={/^#[0-9a-f]{6}$/i.test(brand) ? brand : "#a08a5c"}
+                value={/^#[0-9a-f]{6}$/i.test(brand) ? brand : "#714b67"}
                 onChange={(e) => setBrand(e.target.value)}
                 className="h-9 w-12 shrink-0 cursor-pointer rounded-lg border bg-transparent p-1"
               />
-              <Input id="brand_color" name="brand_color" value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="Default gold" className="font-mono" />
+              <Input id="brand_color" name="brand_color" value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="Default plum" className="font-mono" />
               {brand && (
                 <Button type="button" variant="ghost" size="sm" onClick={() => setBrand("")}>
                   Clear
@@ -103,7 +103,7 @@ function DangerZone({ slug }: { slug: string }) {
           <h3 className="flex items-center gap-2 font-semibold text-destructive">
             <TriangleAlertIcon className="size-4" /> Delete project
           </h3>
-          <p className="text-sm text-muted-foreground">Permanently deletes every lead, appointment, call and setting in this project.</p>
+          <p className="text-sm text-muted-foreground">Permanently deletes every lead, appointment, call and setting in this project, and every team login for it.</p>
         </div>
         <AlertDialog onOpenChange={() => setConfirm("")}>
           <AlertDialogTrigger asChild>
@@ -113,7 +113,7 @@ function DangerZone({ slug }: { slug: string }) {
             <AlertDialogHeader>
               <AlertDialogTitle>Delete this project for everyone?</AlertDialogTitle>
               <AlertDialogDescription>
-                This can&apos;t be undone. Type <span className="font-mono font-semibold text-foreground">{slug}</span> to confirm.
+                Your login and every team member&apos;s login are deleted too, so the emails can be used to sign up again. This can&apos;t be undone. Type <span className="font-mono font-semibold text-foreground">{slug}</span> to confirm.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <Input value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder={slug} autoComplete="off" className="font-mono" />

@@ -1,3 +1,4 @@
+import { io } from "next/cache";
 import {
   CalendarCheckIcon,
   CalendarPlusIcon,
@@ -54,6 +55,8 @@ async function ContactDetail({ params }: { params: Params }) {
   const { slug, id } = await params;
   if (!UUID.test(id)) notFound();
   const ctx = await getProjectContext(slug);
+  await io();
+  const now = new Date();
   const lookups = await getLookups(slug);
   const base = `/p/${slug}`;
 
@@ -139,7 +142,7 @@ async function ContactDetail({ params }: { params: Params }) {
                 projectId={ctx.project.id}
                 contactLabel={ctx.project.contact_label}
                 lookups={client}
-                defaultWhen={toZonedInput(new Date(), ctx.tz).slice(0, 11) + "10:00"}
+                defaultWhen={toZonedInput(now, ctx.tz).slice(0, 11) + "10:00"}
                 record={{ kind: "contact", id: contact.id, name: contact.name, phone: contact.phone }}
                 defaults={{ branch_id: contact.branch_id, service_id: contact.service_id, assigned_to: contact.assigned_to }}
                 trigger={

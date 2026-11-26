@@ -1,3 +1,4 @@
+import { io } from "next/cache";
 import { PlusIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -41,6 +42,7 @@ async function Contacts({ params, searchParams }: { params: Params; searchParams
   const sp = await searchParams;
   const ctx = await getProjectContext(slug);
   const lookups = await getLookups(slug);
+  await io();
   const range = resolveRange(sp.range, ctx.tz, new Date());
   const { page, from, to } = pageWindow(sp.page);
   const label = ctx.project.contact_label;

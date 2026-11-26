@@ -1,3 +1,4 @@
+import { io } from "next/cache";
 import { ActivityIcon, CalendarCheckIcon, ListChecksIcon, RefreshCwIcon, SparklesIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -40,6 +41,7 @@ async function Dashboard({ params, searchParams }: Props) {
   const ctx = await getProjectContext(slug);
   const { supabase, project, tz, base } = ctx;
   const lookups = await getLookups(slug);
+  await io();
   const now = new Date();
   const r = resolveRange(range, tz, now);
   const pid = project.id;

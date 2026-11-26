@@ -30,7 +30,6 @@ async function Search({ params, searchParams }: Props) {
   const term = q.trim().replace(/[%,()*]/g, " ").slice(0, 80);
   const digits = term.replace(/\D/g, "");
 
-  // Match name/email, or phone by digits so "+91 98450" finds "9845048482".
   const filter = [`name.ilike.%${term}%`, `email.ilike.%${term}%`, digits.length >= 4 ? `phone_key.ilike.%${digits.slice(-10)}%` : null]
     .filter(Boolean)
     .join(",");

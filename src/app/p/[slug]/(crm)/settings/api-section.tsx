@@ -24,7 +24,6 @@ export function ApiSection({ slug, apiKey, isAdmin }: { slug: string; apiKey: st
   const { pending, run } = useAction();
 
   useEffect(() => {
-    // window is only available after hydration; the placeholder renders on the server.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setOrigin(window.location.origin);
   }, []);
