@@ -73,16 +73,19 @@ async function Shell({ children, params }: Props) {
 
 function ShellSkeleton() {
   return (
-    <div className="flex min-h-svh gap-3 p-3">
-      <Skeleton className="hidden h-[calc(100svh-1.5rem)] w-60 rounded-2xl lg:block" />
-      <div className="flex flex-1 flex-col gap-3">
-        <Skeleton className="h-14 rounded-2xl" />
-        <Skeleton className="h-24 rounded-2xl" />
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-28 rounded-2xl" />
-          ))}
-        </div>
+    <div className="flex min-h-svh flex-col">
+      <div className="flex h-12 items-center gap-3 border-b bg-navbar px-3">
+        <Skeleton className="size-6 rounded-md" />
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="hidden h-4 w-96 lg:block" />
+      </div>
+      <div className="border-b bg-card px-6 py-3">
+        <Skeleton className="h-8 w-64" />
+      </div>
+      <div className="flex gap-4 p-6">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="h-80 w-72 shrink-0 rounded-md" />
+        ))}
       </div>
     </div>
   );

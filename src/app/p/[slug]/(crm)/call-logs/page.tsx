@@ -86,15 +86,15 @@ async function CallLogs({ params, searchParams }: { params: Params; searchParams
             }
           />
         }
+        search={<FilterBar filters={filters} />}
       />
-      <FilterBar filters={filters} />
 
       {error ? (
         <EmptyState>Couldn&apos;t load calls: {error.message}</EmptyState>
       ) : calls.length === 0 ? (
         <EmptyState>No calls match these filters.</EmptyState>
       ) : (
-        <div className="overflow-hidden rounded-2xl border bg-card/90">
+        <div className="overflow-hidden rounded-lg border bg-card">
           <Table>
             <TableHeader>
               <TableRow className="text-[11px] tracking-wider uppercase">
@@ -177,8 +177,8 @@ function TableSkeleton() {
   return (
     <div className="space-y-4 pt-3">
       <Skeleton className="h-8 w-48" />
-      <Skeleton className="h-20 rounded-2xl" />
-      <Skeleton className="h-96 rounded-2xl" />
+      <Skeleton className="h-20 rounded-lg" />
+      <Skeleton className="h-96 rounded-lg" />
     </div>
   );
 }

@@ -28,10 +28,6 @@ function friendly(message: string) {
   return message;
 }
 
-// ---------------------------------------------------------------------------
-// Project profile
-// ---------------------------------------------------------------------------
-
 export async function updateProjectProfile(slug: string, formData: FormData) {
   return run(async () => {
     const ctx = await authorizeProject(slug, { admin: true });
@@ -79,10 +75,6 @@ export async function deleteProject(slug: string, confirmSlug: string) {
   if (result.ok) redirect("/projects");
   return result;
 }
-
-// ---------------------------------------------------------------------------
-// Members
-// ---------------------------------------------------------------------------
 
 const ASSIGNABLE: MemberRole[] = ["admin", "manager", "agent"];
 
@@ -216,10 +208,6 @@ export async function removeMember(slug: string, userId: string) {
   });
 }
 
-// ---------------------------------------------------------------------------
-// Master data (branches, sources, services, stages)
-// ---------------------------------------------------------------------------
-
 function masterValues(table: MasterTable, formData: FormData) {
   const values: Record<string, unknown> = {};
   for (const f of MASTER_TABLES[table].fields) {
@@ -313,10 +301,6 @@ export async function moveStage(slug: string, stageId: string, direction: "up" |
     return { ok: true };
   });
 }
-
-// ---------------------------------------------------------------------------
-// API key
-// ---------------------------------------------------------------------------
 
 export async function rotateApiKey(slug: string) {
   return run(async () => {

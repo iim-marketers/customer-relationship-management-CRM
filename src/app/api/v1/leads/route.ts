@@ -1,15 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-/**
- * Public lead-capture webhook.
- *
- *   POST /api/v1/leads   (header x-api-key: <project key>, or ?key=)
- *   { name, phone, email, source, service, branch, notes }
- *
- * Leads are de-duplicated by phone inside the project (repeat enquiry).
- */
-
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -27,7 +18,6 @@ export function OPTIONS() {
 
 type Body = Record<string, unknown>;
 
-/** First non-empty string among the given keys (case-insensitive). */
 function pick(body: Body, ...keys: string[]) {
   const lower = Object.fromEntries(Object.entries(body).map(([k, v]) => [k.toLowerCase(), v]));
   for (const k of keys) {
@@ -49,7 +39,6 @@ async function readBody(request: NextRequest): Promise<Body | null> {
     if (type.includes("application/x-www-form-urlencoded") || type.includes("multipart/form-data")) {
       return Object.fromEntries((await request.formData()).entries()) as Body;
     }
-    // Unknown content type: try JSON, then URL-encoded.
     const text = await request.text();
     if (!text) return {};
     try {

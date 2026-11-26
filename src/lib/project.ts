@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Branch, Member, MemberRole, Profile, Project, Service, Source, Stage } from "@/lib/types";
 
-/** The signed-in user, or a redirect to /login. Deduped per request. */
 export const requireUser = cache(async (next?: string) => {
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
@@ -14,11 +13,6 @@ export const requireUser = cache(async (next?: string) => {
   return { supabase, user: data.user };
 });
 
-/**
- * Loads a project by slug for the signed-in user and checks membership.
- * RLS hides projects the user isn't a member of, so "not found" and
- * "no access" both land on the project picker.
- */
 export const getProjectContext = cache(async (slug: string) => {
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getUser();
@@ -57,7 +51,6 @@ export const getProjectContext = cache(async (slug: string) => {
 
 export type ProjectContext = Awaited<ReturnType<typeof getProjectContext>>;
 
-/** Master data used by filters and forms across the CRM. */
 export const getLookups = cache(async (slug: string) => {
   const { supabase, project } = await getProjectContext(slug);
   const [stages, sources, services, branches, members] = await Promise.all([
@@ -89,7 +82,6 @@ export const getLookups = cache(async (slug: string) => {
 
 export type Lookups = Awaited<ReturnType<typeof getLookups>>;
 
-/** Plain, serialisable lookups for client components. */
 export function clientLookups(l: Lookups) {
   return {
     stages: l.stages,
@@ -104,7 +96,6 @@ export function clientLookups(l: Lookups) {
 
 export type ClientLookups = ReturnType<typeof clientLookups>;
 
-/** For server actions: re-authorise against the project on every call. */
 export async function authorizeProject(slug: string, opts: { admin?: boolean; manager?: boolean } = {}) {
   const ctx = await getProjectContext(slug);
   if (opts.admin && !ctx.isAdmin) throw new Error("Only project admins can do this.");

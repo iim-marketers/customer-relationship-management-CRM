@@ -1,7 +1,3 @@
-/**
- * Timezone helpers. Every project has a timezone; all "today", "this week" and
- * display formatting is done in that zone so server and browser agree.
- */
 
 function partsInTz(date: Date, timeZone: string) {
   const dtf = new Intl.DateTimeFormat("en-US", {
@@ -30,7 +26,6 @@ function offsetMs(date: Date, timeZone: string) {
   return Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second) - date.getTime();
 }
 
-/** "2026-11-26T09:30" wall-clock time in `timeZone` → UTC Date. */
 export function zonedToUtc(wall: string, timeZone: string): Date {
   const [d, t = "00:00"] = wall.split("T");
   const guess = new Date(`${d}T${t.length === 5 ? `${t}:00` : t}Z`);
@@ -39,7 +34,6 @@ export function zonedToUtc(wall: string, timeZone: string): Date {
   return new Date(guess.getTime() - offsetMs(first, timeZone));
 }
 
-/** UTC → "YYYY-MM-DDTHH:mm" in timeZone (for datetime-local inputs). */
 export function toZonedInput(iso: string | Date | null | undefined, timeZone: string) {
   if (!iso) return "";
   const p = partsInTz(new Date(iso), timeZone);
@@ -47,7 +41,6 @@ export function toZonedInput(iso: string | Date | null | undefined, timeZone: st
   return `${p.year}-${pad(p.month)}-${pad(p.day)}T${pad(p.hour)}:${pad(p.minute)}`;
 }
 
-/** Calendar date ("YYYY-MM-DD") of an instant in timeZone. */
 export function ymdInTz(date: Date, timeZone: string) {
   return toZonedInput(date, timeZone).slice(0, 10);
 }
@@ -58,14 +51,12 @@ export function addDaysYmd(ymd: string, days: number) {
   return d.toISOString().slice(0, 10);
 }
 
-/** [start, end) of a calendar day in timeZone as UTC instants. */
 export function dayBounds(ymd: string, timeZone: string) {
   return { from: zonedToUtc(`${ymd}T00:00`, timeZone), to: zonedToUtc(`${addDaysYmd(ymd, 1)}T00:00`, timeZone) };
 }
 
-/** Monday of the week containing ymd. */
 export function weekStart(ymd: string) {
-  const dow = new Date(`${ymd}T00:00:00Z`).getUTCDay(); // 0 = Sunday
+  const dow = new Date(`${ymd}T00:00:00Z`).getUTCDay();
   return addDaysYmd(ymd, -((dow + 6) % 7));
 }
 
@@ -107,7 +98,6 @@ export const RANGE_OPTIONS = [
 
 export type RangeKey = (typeof RANGE_OPTIONS)[number]["value"];
 
-/** Resolve a named date range relative to "now" in timeZone. */
 export function resolveRange(range: string | undefined, timeZone: string, now: Date) {
   const key = (RANGE_OPTIONS.find((r) => r.value === range)?.value ?? "all") as RangeKey;
   const label = RANGE_OPTIONS.find((r) => r.value === key)!.label;

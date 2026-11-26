@@ -11,7 +11,6 @@ import { cn } from "@/lib/utils";
 
 const DOW = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 
-/** Week strip with a dot under days that have items. Selected day lives in ?date= */
 export function DayStrip({ selected, today, marked = [] }: { selected: string; today: string; marked?: string[] }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -40,7 +39,7 @@ export function DayStrip({ selected, today, marked = [] }: { selected: string; t
               key={d}
               onClick={() => go(d)}
               className={cn(
-                "flex flex-col items-center rounded-xl border bg-card/90 py-2 transition hover:border-primary/50",
+                "flex flex-col items-center rounded-xl border bg-card py-2 transition hover:border-primary/50",
                 active && "border-primary bg-primary text-primary-foreground hover:border-primary",
               )}
             >

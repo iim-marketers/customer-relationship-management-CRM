@@ -11,7 +11,7 @@ import { readableOn } from "@/lib/utils";
 
 type Branding = { name: string; slug: string; logo_url: string | null; brand_color: string | null; industry: string | null };
 
-/** Public project branding — cached, since it needs no session. */
+// Needs no session, so it can be cached.
 async function getBranding(slug: string): Promise<Branding | null> {
   "use cache";
   cacheLife("minutes");
@@ -30,7 +30,7 @@ export default function ProjectLoginPage({ params }: { params: Promise<{ slug: s
       <Suspense
         fallback={
           <AuthCard>
-            <Skeleton className="mx-auto mb-6 size-20 rounded-2xl" />
+            <Skeleton className="mx-auto mb-6 size-20 rounded-lg" />
             <Skeleton className="mx-auto h-8 w-48" />
           </AuthCard>
         }
@@ -67,7 +67,7 @@ async function ProjectLogin({ params }: { params: Promise<{ slug: string }> }) {
     <AuthCard>
       <div style={brandStyle}>
         <div className="mb-8 flex flex-col items-center text-center">
-          <ProjectLogo project={project} className="mb-5 size-20 rounded-2xl text-2xl" />
+          <ProjectLogo project={project} className="mb-5 size-20 rounded-lg text-2xl" />
           <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
           <p className="mt-2 text-muted-foreground">
             Sign in to continue to the <span className="font-medium text-foreground">{project.name}</span> CRM.

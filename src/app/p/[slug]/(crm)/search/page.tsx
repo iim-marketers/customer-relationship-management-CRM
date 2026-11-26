@@ -16,7 +16,7 @@ type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ q?: st
 
 export default function SearchPage(props: Props) {
   return (
-    <Suspense fallback={<Skeleton className="mt-3 h-64 rounded-2xl" />}>
+    <Suspense fallback={<Skeleton className="mt-3 h-64 rounded-lg" />}>
       <Search {...props} />
     </Suspense>
   );

@@ -27,21 +27,24 @@ export function StagePills({ slug, leadId, stages, current }: { slug: string; le
   const { pending, run } = useAction();
   const [optimistic, setOptimistic] = useState(current);
   return (
-    <div className={cn("flex flex-wrap gap-2", pending && "opacity-70")}>
+    <div className={cn("o-statusbar", pending && "opacity-70")}>
       {stages.map((s) => {
         const active = s.id === optimistic;
         return (
           <button
             key={s.id}
             disabled={pending || active}
+            aria-current={active ? "step" : undefined}
             onClick={() => {
               setOptimistic(s.id);
               run(() => moveLeadStage(slug, leadId, s.id)).then((r) => !r.ok && setOptimistic(current));
             }}
-            className={cn("flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition", !active && "hover:border-primary/50")}
-            style={active ? { background: s.color, borderColor: s.color, color: "#fff" } : undefined}
+            className={cn(
+              "flex shrink-0 items-center gap-1.5 py-1.5 text-sm whitespace-nowrap transition-colors",
+              active ? "bg-primary font-semibold text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground",
+            )}
           >
-            {active ? <CheckIcon className="size-3.5" /> : <span className="size-2 rounded-full" style={{ background: s.color }} />}
+            {active && <CheckIcon className="size-3.5" />}
             {s.name}
           </button>
         );
@@ -105,10 +108,10 @@ export function NoteComposer({ slug, leadId }: { slug: string; leadId: string })
       }}
       className="space-y-2"
     >
-      <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={3} placeholder="Log a call summary, objection, next step…" />
-      <div className="flex justify-end">
-        <Button type="submit" disabled={pending || !body.trim()}>
-          Add note
+      <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={3} placeholder="Log an internal note…" className="bg-card" />
+      <div className="flex justify-start">
+        <Button type="submit" size="sm" disabled={pending || !body.trim()}>
+          Log
         </Button>
       </div>
     </form>
@@ -120,7 +123,6 @@ export function ConvertButton({ slug, leadId, label }: { slug: string; leadId: s
   const router = useRouter();
   return (
     <Button
-      variant="outline"
       disabled={pending}
       onClick={() =>
         run(

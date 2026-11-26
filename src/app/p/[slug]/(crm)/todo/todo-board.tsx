@@ -91,7 +91,7 @@ export function TodoBoard({
               key={c.key}
               onClick={() => setFilter(c.key)}
               className={cn(
-                "flex items-center gap-2 rounded-full border bg-card/90 px-3.5 py-1.5 text-sm font-medium transition hover:border-primary/50",
+                "flex items-center gap-2 rounded-full border bg-card px-3.5 py-1.5 text-sm font-medium transition hover:border-primary/50",
                 active && "border-primary bg-primary text-primary-foreground",
               )}
             >
@@ -143,7 +143,7 @@ function TodoRow({ item, slug, tz, stages }: { item: TodoItem; slug: string; tz:
   const tomorrowAt = (hh: string) => `${addDaysYmd(toZonedInput(new Date(), tz).slice(0, 10), 1)}T${hh}`;
 
   return (
-    <div className={cn("flex items-center gap-3 rounded-2xl border bg-card/90 p-3 sm:p-4", pending && "opacity-60", item.done && "opacity-60")}>
+    <div className={cn("flex items-center gap-3 rounded-lg border bg-card p-3 sm:p-4", pending && "opacity-60", item.done && "opacity-60")}>
       {item.kind === "task" ? (
         <button
           onClick={() => run(() => toggleTask(slug, item.id, !item.done))}

@@ -1,7 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-/** Refreshes the Supabase session cookie and does an optimistic auth redirect. */
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -31,7 +30,6 @@ export async function updateSession(request: NextRequest) {
   const signedIn = Boolean(data?.claims);
   const { pathname, search } = request.nextUrl;
 
-  // /p/<slug>/... (except the project login page) and /projects need a session.
   const projectMatch = pathname.match(/^\/p\/([^/]+)(\/.*)?$/);
   const isProjectLogin = projectMatch && projectMatch[2]?.startsWith("/login");
   const needsAuth =

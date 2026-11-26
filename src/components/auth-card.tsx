@@ -8,7 +8,7 @@ export function AuthCard({ className, children }: { className?: string; children
   return (
     <div
       className={cn(
-        "w-full max-w-md rounded-2xl border bg-card/80 p-8 shadow-2xl shadow-black/20 backdrop-blur",
+        "w-full max-w-md rounded-lg border bg-card p-8 shadow-2xl shadow-black/20 backdrop-blur",
         className,
       )}
     >

@@ -130,7 +130,6 @@ export type Activity = {
   author: { full_name: string | null; email: string | null } | null;
 };
 
-/** Result shape every server action returns. */
 export type ActionResult<T = undefined> =
   | { ok: true; data?: T; message?: string }
   | { ok: false; error: string };

@@ -4,13 +4,11 @@ import { Button } from "@/components/ui/button";
 
 export const PAGE_SIZE = 50;
 
-/** Parse ?page= (1-based) into a page number and a Supabase .range() window. */
 export function pageWindow(page: string | undefined, size = PAGE_SIZE) {
   const n = Math.max(1, Number.parseInt(page ?? "1", 10) || 1);
   return { page: n, from: (n - 1) * size, to: n * size - 1 };
 }
 
-/** Prev/next links that keep the current filters in the URL. */
 export function Pager({
   pathname,
   searchParams,

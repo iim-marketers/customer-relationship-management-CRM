@@ -14,9 +14,9 @@ export function StatCard({
   tone?: "success" | "warning" | "info" | "muted";
 }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border bg-card/90 p-4">
-      <div className="text-sm text-muted-foreground">{label}</div>
-      <div className="mt-1 text-3xl font-bold tracking-tight tabular-nums">{value}</div>
+    <div className="relative overflow-hidden rounded-lg border bg-card p-4 shadow-xs">
+      <div className="text-sm font-medium text-muted-foreground">{label}</div>
+      <div className="mt-1 text-3xl font-semibold tracking-tight text-primary tabular-nums">{value}</div>
       {hint && (
         <div
           className={cn(
@@ -31,12 +31,10 @@ export function StatCard({
         </div>
       )}
       {Icon ? (
-        <span className="absolute top-4 right-4 grid size-10 place-items-center rounded-xl bg-primary/10 text-primary">
-          <Icon className="size-5" />
+        <span className="absolute top-4 right-4 grid size-9 place-items-center rounded-md bg-primary/10 text-primary">
+          <Icon className="size-4.5" />
         </span>
-      ) : (
-        <span aria-hidden className="absolute -right-3 -bottom-3 size-16 rounded-full bg-primary/10" />
-      )}
+      ) : null}
     </div>
   );
 }

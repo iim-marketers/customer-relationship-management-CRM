@@ -1,4 +1,3 @@
-/** Industry presets: picking one sets what the "contacts" tab is called. */
 export const INDUSTRIES = [
   { value: "healthcare", label: "Clinic / Healthcare", contactLabel: "Patients" },
   { value: "wellness", label: "Wellness / Salon / Spa", contactLabel: "Clients" },

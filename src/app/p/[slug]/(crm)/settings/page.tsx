@@ -98,7 +98,7 @@ async function Settings({ params, searchParams }: Props) {
             href={href(s.key)}
             scroll={false}
             className={cn(
-              "group rounded-2xl border bg-card/90 p-4 transition hover:border-primary/50",
+              "group rounded-lg border bg-card p-4 transition hover:border-primary/50",
               s.key === active && "border-primary/70 ring-1 ring-primary/30",
             )}
           >
@@ -121,7 +121,7 @@ async function Settings({ params, searchParams }: Props) {
               scroll={false}
               aria-current={s.key === active ? "page" : undefined}
               className={cn(
-                "shrink-0 rounded-xl border bg-card/90 px-4 py-3 text-sm transition hover:border-primary/50",
+                "shrink-0 rounded-xl border bg-card px-4 py-3 text-sm transition hover:border-primary/50",
                 s.key === active && "border-primary bg-primary/10",
               )}
             >
@@ -170,10 +170,10 @@ function SettingsSkeleton() {
       <Skeleton className="h-10 w-56" />
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 7 }).map((_, i) => (
-          <Skeleton key={i} className="h-36 rounded-2xl" />
+          <Skeleton key={i} className="h-36 rounded-lg" />
         ))}
       </div>
-      <Skeleton className="h-80 rounded-2xl" />
+      <Skeleton className="h-80 rounded-lg" />
     </div>
   );
 }

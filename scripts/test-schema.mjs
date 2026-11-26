@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions -- terse `cond ? ok() : fail()` assertions */
-// Smoke-tests the Supabase migration against an in-process Postgres (PGlite),
-// with a minimal stand-in for Supabase's auth schema. Run: node scripts/test-schema.mjs
 import { PGlite } from "@electric-sql/pglite";
 import { pgcrypto } from "@electric-sql/pglite/contrib/pgcrypto";
 import { readFileSync, readdirSync } from "node:fs";
@@ -28,7 +26,6 @@ const asUser = async (uid, sql, params) => {
   try { return await db.query(sql, params); } finally { await db.exec(`reset role;`); }
 };
 
-// Signup creates profile + project
 const { rows: [alice] } = await db.query(`insert into auth.users (email, raw_user_meta_data) values ('alice@x.com', '{"full_name":"Alice","project_name":"Adyant Ayurveda","contact_label":"Patients"}') returning id`);
 const { rows: [bob] } = await db.query(`insert into auth.users (email, raw_user_meta_data) values ('bob@y.com', '{"full_name":"Bob","project_name":"Adyant Ayurveda"}') returning id`);
 const { rows: projects } = await db.query(`select slug, contact_label from projects order by created_at`);
@@ -36,20 +33,34 @@ projects.length === 2 && projects[0].slug === "adyant-ayurveda" && projects[1].s
 
 const pa = (await db.query(`select id from projects where created_by=$1`, [alice.id])).rows[0].id;
 
+const { rows: [carol] } = await db.query(`insert into auth.users (email, raw_user_meta_data) values ('carol@z.com', '{"full_name":"Carol","username":"Carol_1"}') returning id`);
+const cu = (await db.query(`select username from profiles where id=$1`, [carol.id])).rows[0].username;
+cu === "carol_1" ? ok("signup stores lowercased username") : fail("username: " + cu);
+(await db.query(`select username from profiles where id=$1`, [alice.id])).rows[0].username === null ? ok("username is optional") : fail("username should be null");
+try { await db.query(`insert into auth.users (email, raw_user_meta_data) values ('dup@z.com', '{"username":"carol_1"}')`); fail("duplicate username allowed"); } catch { ok("duplicate username rejected"); }
+try { await db.query(`update profiles set username='no spaces!' where id=$1`, [carol.id]); fail("bad username allowed"); } catch { ok("username format enforced"); }
 
-// Isolation
+const byName = (await db.query(`select * from find_auth_user(null, 'CAROL_1')`)).rows[0];
+const byMail = (await db.query(`select * from find_auth_user('Carol@Z.com')`)).rows[0];
+byName?.email === "carol@z.com" && byMail?.id === carol.id ? ok("find_auth_user by username and email") : fail(JSON.stringify([byName, byMail]));
+await asUser(carol.id, `update profiles set email='alice@x.com' where id=$1`, [carol.id]);
+(await db.query(`select * from find_auth_user('alice@x.com')`)).rows[0]?.id === alice.id ? ok("find_auth_user ignores edited profile emails") : fail("lookup spoofable");
+try { await asUser(alice.id, `select * from find_auth_user('carol@z.com')`); fail("users can call find_auth_user"); } catch { ok("find_auth_user is server-only"); }
+
+await db.query(`insert into password_reset_codes (user_id, code_hash, expires_at) values ($1, 'x', now() + interval '10 minutes')`, [alice.id]);
+const leaked = await asUser(alice.id, `select count(*)::int n from password_reset_codes`);
+leaked.rows[0].n === 0 ? ok("password_reset_codes hidden from users (RLS)") : fail("reset codes readable by users");
+
 const seen = await asUser(alice.id, `select id from projects`);
 seen.rows.length === 1 && seen.rows[0].id === pa ? ok("alice sees only her project") : fail("isolation broken: " + JSON.stringify(seen.rows));
 const st = await asUser(bob.id, `select count(*)::int n from lead_stages where project_id=$1`, [pa]);
 st.rows[0].n === 0 ? ok("bob can't read alice's stages") : fail("stages leak");
 
-// capture_lead + repeat detection
 const r1 = await asUser(alice.id, `select capture_lead($1, 'Raksha', '+91 97439 17025', null, 'Meta Ads', 'Massage') as r`, [pa]);
 const r2 = await asUser(alice.id, `select capture_lead($1, 'Raksha again', '9743917025', null, 'Website') as r`, [pa]);
 r2.rows[0].r.repeat && r2.rows[0].r.id === r1.rows[0].r.id ? ok("repeat enquiry detected by phone") : fail(JSON.stringify([r1.rows, r2.rows]));
 try { await asUser(bob.id, `select capture_lead($1, 'Hacker', '1234567890')`, [pa]); fail("bob captured into alice's project"); } catch { ok("capture_lead rejects non-members"); }
 
-// stage change logs activity, convert_lead
 const leadId = r1.rows[0].r.id;
 await asUser(alice.id, `update leads set stage_id = (select id from lead_stages where project_id=$1 and name='Follow-up') where id=$2`, [pa, leadId]);
 const contactId = (await asUser(alice.id, `select convert_lead($1) as c`, [leadId])).rows[0].c;
@@ -57,7 +68,6 @@ const acts = await asUser(alice.id, `select type, body from lead_activities wher
 acts.rows.filter(a => a.type === "stage_change").length === 2 ? ok("stage changes logged: " + acts.rows.map(a=>a.body).join(" | ")) : fail(JSON.stringify(acts.rows));
 contactId ? ok("lead converted to contact") : fail("convert failed");
 
-// stats
 const ds = (await asUser(alice.id, `select dashboard_stats($1) as s`, [pa])).rows[0].s;
 ds.total_leads === 1 && ds.converted === 1 && ds.stages.length === 7 ? ok("dashboard_stats") : fail(JSON.stringify(ds));
 const rs = (await asUser(alice.id, `select report_stats($1) as s`, [pa])).rows[0].s;
@@ -65,12 +75,10 @@ rs.sources.length >= 1 && rs.daily.length === 1 ? ok("report_stats") : fail(JSON
 const leak = (await asUser(bob.id, `select dashboard_stats($1) as s`, [pa])).rows[0].s;
 leak.total_leads === 0 ? ok("stats obey RLS for outsiders") : fail("stats leak");
 
-// owner protection + secrets
 try { await asUser(alice.id, `update project_members set role='agent' where project_id=$1 and user_id=$2`, [pa, alice.id]); fail("last owner demoted"); } catch { ok("last owner protected"); }
 const sec = await asUser(bob.id, `select count(*)::int n from project_secrets where project_id=$1`, [pa]);
 sec.rows[0].n === 0 ? ok("secrets hidden from outsiders") : fail("secret leak");
 
-// create_project RPC + delete cascade
 const np = (await asUser(alice.id, `select (create_project('Second Clinic')).slug as s`)).rows[0].s;
 np === "second-clinic" ? ok("create_project rpc") : fail(np);
 await asUser(alice.id, `delete from projects where slug='second-clinic'`);
@@ -80,7 +88,6 @@ ok("deleting a user cascades cleanly");
 
 const br = await db.query(`select * from get_project_branding('adyant-ayurveda')`);
 br.rows[0]?.name === "Adyant Ayurveda" ? ok("public branding lookup") : fail("branding");
-// Demo seed script runs cleanly against the schema
 const seed = readFileSync("supabase/seed-demo.sql", "utf8").replaceAll("'your-project-slug'", "'adyant-ayurveda'");
 await db.exec(seed);
 const counts = (await db.query(`select (select count(*) from leads)::int l, (select count(*) from contacts)::int c,

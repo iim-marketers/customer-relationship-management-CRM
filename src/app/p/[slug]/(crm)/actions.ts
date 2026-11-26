@@ -35,10 +35,7 @@ async function logActivity(ctx: Ctx, leadId: string, type: string, body: string)
   });
 }
 
-/**
- * Moves an open lead to the first stage whose name matches, e.g. "appointment"
- * → "Appointment Booked". Projects can rename stages, so this is best-effort.
- */
+// Best-effort: projects can rename stages.
 async function moveLeadToStageLike(ctx: Ctx, leadId: string, pattern: string) {
   const { stages } = await getLookups(ctx.project.slug);
   const target = stages.find((s) => s.kind === "open" && s.name.toLowerCase().includes(pattern));
@@ -49,10 +46,6 @@ async function moveLeadToStageLike(ctx: Ctx, leadId: string, pattern: string) {
     await ctx.supabase.from("leads").update({ stage_id: target.id }).eq("id", leadId);
   }
 }
-
-// ---------------------------------------------------------------------------
-// Leads
-// ---------------------------------------------------------------------------
 
 export async function createLead(slug: string, formData: FormData) {
   return run<{ id: string; repeat: boolean }>(async () => {
@@ -118,7 +111,6 @@ export async function moveLeadStage(slug: string, leadId: string, stageId: strin
     if (!stage) return { ok: false, error: "Unknown stage" };
 
     if (stage.kind === "won") {
-      // Winning a lead creates the contact record too.
       const { error } = await ctx.supabase.rpc("convert_lead", { p_lead: leadId });
       if (error) return { ok: false, error: error.message };
       const { error: e2 } = await ctx.supabase.from("leads").update({ stage_id: stageId }).eq("id", leadId);
@@ -173,10 +165,6 @@ export async function convertLead(slug: string, leadId: string) {
   });
 }
 
-// ---------------------------------------------------------------------------
-// Tasks
-// ---------------------------------------------------------------------------
-
 export async function createTask(slug: string, formData: FormData) {
   return run(async () => {
     const ctx = await authorizeProject(slug);
@@ -219,10 +207,6 @@ export async function deleteTask(slug: string, taskId: string) {
     return { ok: true, message: "Task deleted" };
   });
 }
-
-// ---------------------------------------------------------------------------
-// Appointments
-// ---------------------------------------------------------------------------
 
 export async function createAppointment(slug: string, formData: FormData) {
   return run(async () => {
@@ -297,17 +281,12 @@ export async function deleteAppointment(slug: string, appointmentId: string) {
   });
 }
 
-// ---------------------------------------------------------------------------
-// Call logs
-// ---------------------------------------------------------------------------
-
 export async function createCallLog(slug: string, formData: FormData) {
   return run(async () => {
     const ctx = await authorizeProject(slug);
     const phone = str(formData.get("phone"));
     if (!phone) return { ok: false, error: "Phone number is required" };
 
-    // Link to an existing lead / contact with the same number.
     const key = phone.replace(/\D/g, "").slice(-10);
     const [{ data: lead }, { data: contact }] = await Promise.all([
       ctx.supabase.from("leads").select("id, name").eq("project_id", ctx.project.id).eq("phone_key", key).limit(1).maybeSingle(),
@@ -371,10 +350,6 @@ export async function deleteCallLog(slug: string, callId: string) {
     return { ok: true, message: "Call log deleted" };
   });
 }
-
-// ---------------------------------------------------------------------------
-// Contacts (customers / patients / clients …)
-// ---------------------------------------------------------------------------
 
 function contactFields(formData: FormData) {
   return {

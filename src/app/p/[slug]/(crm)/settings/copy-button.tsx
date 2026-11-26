@@ -13,7 +13,6 @@ export function CopyButton({ value, label = "Copy" }: { value: string; label?: s
       variant="outline"
       size="sm"
       onClick={async () => {
-        // Relative paths are copied as full URLs.
         const text = value.startsWith("/") ? `${window.location.origin}${value}` : value;
         try {
           await navigator.clipboard.writeText(text);

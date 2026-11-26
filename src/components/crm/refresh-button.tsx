@@ -10,8 +10,8 @@ export function RefreshButton() {
   const router = useRouter();
   const [pending, start] = useTransition();
   return (
-    <Button variant="outline" onClick={() => start(() => router.refresh())} disabled={pending}>
-      <RefreshCwIcon className={cn(pending && "animate-spin")} /> Refresh
+    <Button variant="ghost" size="icon" onClick={() => start(() => router.refresh())} disabled={pending} aria-label="Refresh" title="Refresh">
+      <RefreshCwIcon className={cn(pending && "animate-spin")} />
     </Button>
   );
 }

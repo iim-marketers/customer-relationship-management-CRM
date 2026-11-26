@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 
 export type PickedRecord = { kind: "lead" | "contact"; id: string; name: string; phone: string | null };
 
-/** Type-ahead search over leads and contacts (RLS scopes results to the project). */
 export function RecordPicker({
   projectId,
   contactLabel,
@@ -31,7 +30,7 @@ export function RecordPicker({
   useEffect(() => {
     clearTimeout(timer.current);
     const term = q.trim();
-    if (term.length < 2) return; // dropdown is hidden below 2 chars
+    if (term.length < 2) return;
     timer.current = setTimeout(async () => {
       setLoading(true);
       const supabase = createClient();
