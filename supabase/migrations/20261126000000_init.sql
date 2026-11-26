@@ -1,16 +1,6 @@
--- =============================================================================
--- Multi-project CRM — initial schema
---
--- Every business table carries project_id. Row Level Security restricts every
--- row to members of that project, so one Supabase database safely serves many
--- projects (tenants).
--- =============================================================================
 
 create extension if not exists pgcrypto;
 
--- -----------------------------------------------------------------------------
--- Enums
--- -----------------------------------------------------------------------------
 create type public.member_role as enum ('owner', 'admin', 'manager', 'agent');
 create type public.stage_kind as enum ('open', 'won', 'lost');
 create type public.appointment_status as enum (
@@ -19,9 +9,6 @@ create type public.appointment_status as enum (
 create type public.call_direction as enum ('incoming', 'outgoing');
 create type public.call_status as enum ('answered', 'missed', 'busy', 'failed');
 
--- -----------------------------------------------------------------------------
--- Tables
--- -----------------------------------------------------------------------------
 create table public.profiles (
   id          uuid primary key references auth.users (id) on delete cascade,
   full_name   text,
@@ -101,7 +88,6 @@ create table public.services (
   unique (project_id, name)
 );
 
--- Converted customers (labelled per project: Patients, Clients, Students...)
 create table public.contacts (
   id           uuid primary key default gen_random_uuid(),
   project_id   uuid not null references public.projects (id) on delete cascade,
@@ -197,9 +183,6 @@ create table public.call_logs (
   created_at        timestamptz not null default now()
 );
 
--- -----------------------------------------------------------------------------
--- Indexes
--- -----------------------------------------------------------------------------
 create index on public.project_members (user_id);
 create index on public.branches (project_id);
 create index on public.lead_stages (project_id, position);
@@ -216,9 +199,7 @@ create index on public.appointments (project_id, scheduled_at);
 create index on public.tasks (project_id, due_at);
 create index on public.call_logs (project_id, called_at desc);
 
--- -----------------------------------------------------------------------------
--- Membership helpers (security definer so RLS policies don't recurse)
--- -----------------------------------------------------------------------------
+-- security definer so RLS policies don't recurse
 create or replace function public.is_member(p_project uuid)
 returns boolean language sql stable security definer set search_path = public as $$
   select exists (
@@ -250,9 +231,6 @@ returns boolean language sql stable security definer set search_path = public as
   );
 $$;
 
--- -----------------------------------------------------------------------------
--- Project creation (used by the signup trigger and the "New project" button)
--- -----------------------------------------------------------------------------
 create or replace function public.slugify(p_text text)
 returns text language sql immutable as $$
   select left(trim(both '-' from regexp_replace(lower(coalesce(p_text, '')), '[^a-z0-9]+', '-', 'g')), 40);
@@ -319,7 +297,6 @@ begin
 end;
 $$;
 
--- Callable by any signed-in user to start an additional project.
 create or replace function public.create_project(
   p_name text,
   p_industry text default null,
@@ -334,7 +311,6 @@ begin
 end;
 $$;
 
--- On signup: create the profile, and the project if one was requested.
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
@@ -358,23 +334,19 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
--- Public branding for the per-project login page (name/logo only).
 create or replace function public.get_project_branding(p_slug text)
 returns table (name text, slug text, logo_url text, brand_color text, industry text)
 language sql stable security definer set search_path = public as $$
   select name, slug, logo_url, brand_color, industry from public.projects where slug = p_slug;
 $$;
 
--- -----------------------------------------------------------------------------
--- Lead capture with repeat-enquiry detection (used by UI and webhook)
--- -----------------------------------------------------------------------------
 create or replace function public.capture_lead(
   p_project      uuid,
   p_name         text,
   p_phone        text default null,
   p_email        text default null,
-  p_source       text default null,   -- source name; created if missing
-  p_service      text default null,   -- service name; created if missing
+  p_source       text default null,
+  p_service      text default null,
   p_branch_id    uuid default null,
   p_assigned_to  uuid default null,
   p_notes        text default null,
@@ -397,7 +369,6 @@ begin
     raise exception 'A name or phone number is required';
   end if;
 
-  -- Ignore references that don't belong to this project.
   if p_stage_id is not null and not exists (select 1 from public.lead_stages where id = p_stage_id and project_id = p_project) then
     p_stage_id := null;
   end if;
@@ -426,7 +397,6 @@ begin
     end if;
   end if;
 
-  -- Repeat enquiry: same phone already exists in this project.
   if char_length(v_key) >= 7 then
     select * into v_existing from public.leads
       where project_id = p_project and phone_key = v_key
@@ -476,7 +446,6 @@ begin
 end;
 $$;
 
--- Convert a lead into a contact (customer/patient) and move it to the won stage.
 create or replace function public.convert_lead(p_lead uuid)
 returns uuid
 language plpgsql security invoker set search_path = public as $$
@@ -494,7 +463,6 @@ begin
     return v_lead.contact_id;
   end if;
 
-  -- Re-use an existing contact with the same phone.
   if char_length(v_lead.phone_key) >= 7 then
     select id into v_contact from public.contacts
       where project_id = v_lead.project_id and phone_key = v_lead.phone_key limit 1;
@@ -520,9 +488,6 @@ begin
 end;
 $$;
 
--- -----------------------------------------------------------------------------
--- Triggers: updated_at + automatic activity log on stage change
--- -----------------------------------------------------------------------------
 create or replace function public.touch_lead()
 returns trigger language plpgsql security definer set search_path = public as $$
 declare
@@ -544,7 +509,6 @@ $$;
 create trigger leads_touch before update on public.leads
   for each row execute function public.touch_lead();
 
--- A project must always keep at least one active owner.
 create or replace function public.protect_last_owner()
 returns trigger language plpgsql security definer set search_path = public as $$
 declare
@@ -567,9 +531,7 @@ $$;
 create trigger members_protect_owner before update or delete on public.project_members
   for each row execute function public.protect_last_owner();
 
--- -----------------------------------------------------------------------------
--- Aggregates for the dashboard and reports (security invoker → obey RLS)
--- -----------------------------------------------------------------------------
+-- security invoker, so these obey RLS
 create or replace function public.dashboard_stats(
   p_project uuid,
   p_from timestamptz default null,
@@ -683,9 +645,6 @@ language sql stable security invoker set search_path = public as $$
   );
 $$;
 
--- -----------------------------------------------------------------------------
--- Row Level Security
--- -----------------------------------------------------------------------------
 alter table public.profiles         enable row level security;
 alter table public.projects         enable row level security;
 alter table public.project_secrets  enable row level security;
@@ -701,13 +660,11 @@ alter table public.appointments     enable row level security;
 alter table public.tasks            enable row level security;
 alter table public.call_logs        enable row level security;
 
--- profiles
 create policy "profiles: read self or teammates" on public.profiles
   for select to authenticated using (id = auth.uid() or public.shares_project(id));
 create policy "profiles: update self" on public.profiles
   for update to authenticated using (id = auth.uid()) with check (id = auth.uid());
 
--- projects (created through create_project RPC only)
 create policy "projects: members read" on public.projects
   for select to authenticated using (public.is_member(id));
 create policy "projects: admins update" on public.projects
@@ -715,13 +672,11 @@ create policy "projects: admins update" on public.projects
 create policy "projects: owners delete" on public.projects
   for delete to authenticated using (public.has_role(id, array['owner']::public.member_role[]));
 
--- secrets
 create policy "secrets: admins read" on public.project_secrets
   for select to authenticated using (public.is_admin(project_id));
 create policy "secrets: admins rotate" on public.project_secrets
   for update to authenticated using (public.is_admin(project_id)) with check (public.is_admin(project_id));
 
--- members
 create policy "members: members read" on public.project_members
   for select to authenticated using (public.is_member(project_id));
 create policy "members: admins insert" on public.project_members
@@ -731,7 +686,6 @@ create policy "members: admins update" on public.project_members
 create policy "members: admins delete" on public.project_members
   for delete to authenticated using (public.is_admin(project_id));
 
--- master data: members read, admins write
 do $$
 declare t text;
 begin
@@ -743,7 +697,6 @@ begin
   end loop;
 end $$;
 
--- operational data: members read/write, managers+ delete
 do $$
 declare t text;
 begin
@@ -755,9 +708,6 @@ begin
   end loop;
 end $$;
 
--- -----------------------------------------------------------------------------
--- Grants
--- -----------------------------------------------------------------------------
 revoke execute on function public.create_project_for(uuid, text, text, text) from public, anon, authenticated;
 revoke execute on function public.handle_new_user() from public, anon, authenticated;
 grant execute on function public.get_project_branding(text) to anon, authenticated;

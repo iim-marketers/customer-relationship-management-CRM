@@ -11,7 +11,7 @@ import { readableOn } from "@/lib/utils";
 
 type Branding = { name: string; slug: string; logo_url: string | null; brand_color: string | null; industry: string | null };
 
-/** Public project branding — cached, since it needs no session. */
+// Needs no session, so it can be cached.
 async function getBranding(slug: string): Promise<Branding | null> {
   "use cache";
   cacheLife("minutes");

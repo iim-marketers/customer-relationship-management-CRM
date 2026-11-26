@@ -138,7 +138,6 @@ async function LeadDetail({ params }: Props) {
     { icon: ClipboardCheckIcon, n: openTasks, label: "Tasks" },
   ];
 
-  // Chatter, grouped by day like Odoo.
   const messages = [
     ...activityRows.map((a) => ({
       id: a.id,
@@ -164,7 +163,6 @@ async function LeadDetail({ params }: Props) {
       />
 
       <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_460px]">
-        {/* Form view */}
         <div className="min-w-0">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap gap-2">
@@ -346,7 +344,6 @@ async function LeadDetail({ params }: Props) {
           </div>
         </div>
 
-        {/* Chatter */}
         <aside className="min-w-0 xl:sticky xl:top-16">
           <div className="mb-3 flex flex-wrap items-center gap-2">
             <span className="inline-flex h-8 items-center gap-1.5 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground">

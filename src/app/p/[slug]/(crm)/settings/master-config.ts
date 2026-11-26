@@ -1,4 +1,3 @@
-/** Field definitions for the generic master-list editor (branches, sources, services, stages). */
 
 export type MasterField = {
   name: string;
@@ -7,7 +6,6 @@ export type MasterField = {
   required?: boolean;
   placeholder?: string;
   options?: { value: string; label: string }[];
-  /** Show as a column in the list. */
   column?: boolean;
 };
 

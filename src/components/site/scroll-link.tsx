@@ -1,9 +1,5 @@
 "use client";
 
-/**
- * In-page anchor that glides to its target section (or jumps, for users who
- * prefer reduced motion) and keeps the #hash in the URL.
- */
 export function ScrollLink({ href, className, children }: { href: `#${string}`; className?: string; children: React.ReactNode }) {
   return (
     <a

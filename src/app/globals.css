@@ -3,7 +3,6 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
-/* Laptop screens with little vertical room (e.g. 1366×768 minus browser chrome). */
 @custom-variant short {
   @media (max-height: 760px) {
     @slot;
@@ -62,7 +61,6 @@
   --color-navbar-foreground: var(--navbar-foreground);
 }
 
-/* Light — Odoo-style: neutral grays, plum primary, teal accents */
 :root {
   --background: #f9fafb;
   --foreground: #1f2937;
@@ -105,7 +103,6 @@
   --sidebar-ring: #017e84;
 }
 
-/* Dark — Odoo dark mode feel */
 .dark {
   --background: #1b1d26;
   --foreground: #e4e6eb;
@@ -162,7 +159,6 @@
   }
 }
 
-/* Odoo-style statusbar: chevron-shaped stage buttons */
 @layer components {
   .o-statusbar {
     display: flex;

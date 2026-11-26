@@ -1,10 +1,7 @@
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
 
-/**
- * Secret-key (service role) client. Bypasses RLS — only use after authorizing the caller
- * yourself (e.g. checking they are an admin of the project).
- */
+// Bypasses RLS: authorize the caller yourself before using it.
 export function createAdminClient() {
   const key = process.env.SUPABASE_SECRET_KEY;
   if (!key) {

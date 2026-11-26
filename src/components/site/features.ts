@@ -9,7 +9,6 @@ import {
   WebhookIcon,
 } from "lucide-react";
 
-/** Product modules shown on the landing page and in the header's CRM menu. */
 export const FEATURES = [
   { id: "pipeline", icon: KanbanSquareIcon, color: "#714b67", title: "Lead pipeline", body: "Kanban and list views with drag-and-drop stages you define." },
   { id: "follow-ups", icon: ListTodoIcon, color: "#e99d00", title: "Follow-up to-dos", body: "A daily queue of due and overdue follow-ups for every agent." },

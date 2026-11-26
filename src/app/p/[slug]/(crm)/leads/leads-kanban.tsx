@@ -43,7 +43,6 @@ function activityState(lead: Lead, nowIso: string, todayEndIso: string): Activit
   return "planned";
 }
 
-/** Stable pastel colour per id — Odoo tints tags and avatars this way. */
 const PALETTE = ["#f06050", "#f4a460", "#f7cd1f", "#6cc1ed", "#814968", "#eb7e7f", "#2c8397", "#475577", "#d6145f", "#30c381", "#9365b8"];
 function tint(id: string) {
   let h = 0;

@@ -3,6 +3,8 @@ import { KanbanSquareIcon } from "lucide-react";
 import Link from "next/link";
 import { BrandMark } from "@/components/brand";
 import { FEATURES, featureTile } from "@/components/site/features";
+import { scriptFont } from "@/lib/fonts";
+import { cn } from "@/lib/utils";
 import { SignupForm } from "./signup-form";
 
 export const metadata: Metadata = { title: "Create a project" };
@@ -14,9 +16,7 @@ const HIGHLIGHTS = FEATURES.filter((f) =>
 export default function SignupPage() {
   return (
     <main className="grid min-h-svh grid-cols-1 lg:h-svh lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:overflow-hidden">
-      {/* Brand panel: large screens only */}
       <aside className="relative hidden flex-col justify-between overflow-hidden bg-[#150f1d] p-10 text-white lg:flex xl:p-12 short:py-7">
-        {/* Deep plum → ink, with a plum glow top-left and a teal glow bottom-right. Fixed in both themes. */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_0%_0%,rgb(113_75_103/0.85),transparent_70%),radial-gradient(ellipse_70%_50%_at_100%_100%,rgb(1_126_132/0.4),transparent_70%),linear-gradient(160deg,#2b1a2c,#150f1d_60%)]"
@@ -36,10 +36,15 @@ export default function SignupPage() {
         </Link>
 
         <div className="relative max-w-md">
-          <h1 className="text-4xl leading-tight font-bold tracking-tight xl:text-5xl short:text-3xl xl:short:text-4xl">
-            Start a new CRM in a minute.
+          <h1
+            className={cn(
+              scriptFont.className,
+              "text-6xl leading-[0.95] xl:text-7xl short:text-5xl xl:short:text-6xl",
+            )}
+          >
+            Start a new CRM <span className="block text-[#f2645e]">in a minute</span>
           </h1>
-          <p className="mt-4 text-lg text-white/70 short:mt-3 short:text-base">
+          <p className="mt-5 text-lg text-white/70 short:mt-3 short:text-base">
             Your pipeline, lead sources and first branch are set up for you.
             Invite your team when you&apos;re ready.
           </p>
@@ -61,11 +66,10 @@ export default function SignupPage() {
           </ul>
         </div>
 
-        {/* Balances the logo so the headline stays vertically centred. */}
+        {/* Balances the logo so the headline stays centred. */}
         <div aria-hidden className="h-8" />
       </aside>
 
-      {/* Form */}
       <section className="flex items-center justify-center px-4 py-8 sm:px-8 lg:overflow-y-auto lg:py-6">
         <div className="w-full max-w-xl">
           <BrandMark className="mb-6 text-lg lg:hidden" />

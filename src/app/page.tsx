@@ -10,20 +10,13 @@ import {
   SearchIcon,
   XIcon,
 } from "lucide-react";
-import { Caveat_Brush } from "next/font/google";
 import Link from "next/link";
 import { FEATURES, featureTile } from "@/components/site/features";
 import { ScrollLink } from "@/components/site/scroll-link";
 import { SiteHeader, Wordmark } from "@/components/site/site-header";
+import { scriptFont as script } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
 
-const script = Caveat_Brush({
-  weight: "400",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-/** Odoo-marketing coral used for the highlighted word and sparks. */
 const CORAL = "text-[#f2645e]";
 
 export default function Home() {
@@ -31,7 +24,6 @@ export default function Home() {
     <div className="min-h-svh overflow-x-clip bg-white text-[#374151] dark:bg-background dark:text-foreground">
       <SiteHeader />
 
-      {/* Hero */}
       <section className="mx-auto max-w-6xl px-4 pt-14 text-center sm:px-6">
         <h1
           className={cn(
@@ -73,7 +65,6 @@ export default function Home() {
         </p>
       </section>
 
-      {/* Product shot on a curved backdrop */}
       <section id="overview" className="relative mt-12 scroll-mt-24">
         <div
           aria-hidden
@@ -84,7 +75,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features */}
       <section
         id="features"
         className="-scroll-mt-10 bg-[#f1f2f4] pb-16 dark:bg-muted"
@@ -142,7 +132,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Closing CTA */}
       <section className="px-4 py-16 text-center sm:px-6">
         <h2
           className={cn(
@@ -178,12 +167,7 @@ export default function Home() {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* Static picture of the app's real Pipeline screen (leads kanban).    */
-/* Mirrors app-shell.tsx, page-header.tsx, filter-bar.tsx and          */
-/* leads-kanban.tsx, filled with sample data from a clinic project     */
-/* using the default stages a new project starts with.                */
-/* ------------------------------------------------------------------ */
+// Static mock of the Pipeline screen; keep in sync with app-shell, page-header, filter-bar and leads-kanban.
 
 type FollowUp = "overdue" | "today" | "planned" | "none";
 type SampleLead = {
@@ -197,7 +181,6 @@ type SampleLead = {
   owner: keyof typeof OWNERS;
 };
 
-/** Same colour families the app uses for follow-up state (bar + clock icon). */
 const FOLLOW_UP: Record<FollowUp, { bar: string; icon: string }> = {
   planned: { bar: "bg-[#28a745]", icon: "text-[#28a745]" },
   today: { bar: "bg-[#e99d00]", icon: "text-[#e99d00]" },
@@ -205,7 +188,6 @@ const FOLLOW_UP: Record<FollowUp, { bar: string; icon: string }> = {
   none: { bar: "bg-[#6b7280]/25", icon: "text-[#6b7280]/60" },
 };
 
-/** Source tags and assignee avatars are tinted from the app's palette. */
 const SOURCE_COLOR: Record<string, string> = {
   Website: "#d6145f",
   "Meta Ads": "#9365b8",
@@ -276,7 +258,6 @@ function PipelineMockup() {
       aria-hidden
       className="pointer-events-none overflow-hidden rounded-xl border border-black/5 bg-[#f9fafb] text-[#1f2937] shadow-[0_30px_80px_-20px_rgba(17,24,39,0.35)] select-none"
     >
-      {/* navbar — app-shell.tsx */}
       <div className="flex h-11 items-center gap-1 border-b border-[#dee2e6] bg-white px-2.5 text-[12px] text-[#374151]">
         <span className="grid size-7 place-items-center">
           <LayoutGridIcon className="size-3.5" />
@@ -306,7 +287,6 @@ function PipelineMockup() {
         </span>
       </div>
 
-      {/* control panel — page-header.tsx + filter-bar.tsx */}
       <div className="flex items-center gap-3 border-b border-[#dee2e6] bg-white px-4 py-2 text-[12px]">
         <span className="rounded-md bg-[#714b67] px-2.5 py-1 font-medium text-white">New</span>
         <span className="leading-tight">
@@ -344,7 +324,6 @@ function PipelineMockup() {
         </span>
       </div>
 
-      {/* kanban — leads-kanban.tsx */}
       <div className="flex gap-3 px-4 pt-3 pb-5">
         {STAGES.map((stage) => {
           const sum = stage.bar.reduce((a, b) => a + b, 0) || 1;

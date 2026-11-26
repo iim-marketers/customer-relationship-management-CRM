@@ -2,10 +2,6 @@ import "server-only";
 import { redirect } from "next/navigation";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-/**
- * Send a freshly signed-in user to the right place. On a branded project login,
- * only that project's members get in.
- */
 export async function enterApp(
   supabase: SupabaseClient,
   userId: string,

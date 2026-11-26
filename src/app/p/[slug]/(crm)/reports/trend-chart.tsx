@@ -3,7 +3,6 @@
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 
-// Categorical slots 1 & 2 of the validated reference palette, stepped per mode.
 const config = {
   count: { label: "Leads", theme: { light: "#2a78d6", dark: "#3987e5" } },
   converted: { label: "Converted", theme: { light: "#eb6834", dark: "#d95926" } },

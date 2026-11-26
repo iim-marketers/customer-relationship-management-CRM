@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-/** Shared by the signup / reset forms (live hints) and the server actions (source of truth). */
-
 export const USERNAME_PATTERN = /^[a-z0-9_]{3,30}$/;
 
 export const usernameSchema = z
@@ -25,7 +23,6 @@ export const emailSchema = z.email("Enter a valid email").trim().toLowerCase();
 
 export const OTP_LENGTH = 6;
 
-/** 0–4 score for the strength meter. Advisory only; the server enforces length. */
 export function passwordStrength(pw: string): { score: 0 | 1 | 2 | 3 | 4; label: string } {
   if (!pw) return { score: 0, label: "" };
   if (pw.length < PASSWORD_MIN) return { score: 0, label: "Too short" };
@@ -36,7 +33,6 @@ export function passwordStrength(pw: string): { score: 0 | 1 | 2 | 3 | 4; label:
 
 export type FieldErrors = Partial<Record<string, string>>;
 
-/** First message per field from a zod error. */
 export function fieldErrorsFrom(error: z.ZodError): FieldErrors {
   const out: FieldErrors = {};
   for (const issue of error.issues) {

@@ -1,10 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-/**
- * Odoo-style control panel: a full-bleed white bar under the navbar with
- * [primary action] breadcrumb / title · search box · view controls.
- */
 export function PageHeader({
   title,
   description,
@@ -17,9 +13,7 @@ export function PageHeader({
   title: React.ReactNode;
   description?: React.ReactNode;
   breadcrumbs?: { label: string; href: string }[];
-  /** Main create button, shown left of the title like Odoo's "New". */
   primary?: React.ReactNode;
-  /** Search / filter box, centred in the panel. */
   search?: React.ReactNode;
   actions?: React.ReactNode;
   className?: string;

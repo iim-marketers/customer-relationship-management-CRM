@@ -1,15 +1,9 @@
--- Usernames on profiles + one-time codes for "forgot password".
 
--- -----------------------------------------------------------------------------
--- Usernames
--- -----------------------------------------------------------------------------
--- Stored lowercase. Optional so team members created from Settings (who sign in
--- with their email) don't need one.
+-- Optional: team members added from Settings sign in by email.
 alter table public.profiles
   add column username text unique
   check (username ~ '^[a-z0-9_]{3,30}$');
 
--- On signup: also copy the chosen username into the profile.
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
@@ -36,10 +30,7 @@ $$;
 
 revoke execute on function public.handle_new_user() from public, anon, authenticated;
 
--- -----------------------------------------------------------------------------
--- Password reset codes
--- -----------------------------------------------------------------------------
--- Only the server (secret key) touches this table: RLS is on with no policies.
+-- RLS on with no policies: server-only.
 create table public.password_reset_codes (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid not null references auth.users (id) on delete cascade,
@@ -55,11 +46,7 @@ create index password_reset_codes_user_idx on public.password_reset_codes (user_
 alter table public.password_reset_codes enable row level security;
 revoke all on public.password_reset_codes from public, anon, authenticated;
 
--- -----------------------------------------------------------------------------
--- Account lookup for sign-in by username and password reset
--- -----------------------------------------------------------------------------
--- Reads the email from auth.users (users can edit their own profiles row, so
--- profiles.email isn't trustworthy for this). Server-only.
+-- Reads auth.users, not profiles.email, which users can edit.
 create or replace function public.find_auth_user(p_email text default null, p_username text default null)
 returns table (id uuid, email text, full_name text)
 language sql stable security definer set search_path = public as $$

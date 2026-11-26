@@ -44,7 +44,6 @@ async function isUsernameTaken(username: string) {
   return Boolean(data);
 }
 
-/** Live check for the signup form. */
 export async function checkUsername(raw: string): Promise<{ available: boolean; error?: string }> {
   const parsed = usernameSchema.safeParse(raw);
   if (!parsed.success) return { available: false, error: parsed.error.issues[0].message };
@@ -62,8 +61,7 @@ export async function signUp(_: AuthState, formData: FormData): Promise<AuthStat
   if (!process.env.SUPABASE_SECRET_KEY) return { error: MISSING_SECRET };
   if (await isUsernameTaken(username)) return { fieldErrors: { username: "That username is taken" } };
 
-  // Created with the secret key and pre-confirmed, so there's no email verification step
-  // regardless of the project's "Confirm email" setting.
+  // Pre-confirmed so sign-up never waits on email verification, whatever the Supabase setting.
   const { error } = await createAdminClient().auth.admin.createUser({
     email,
     password,
@@ -81,7 +79,7 @@ export async function signUp(_: AuthState, formData: FormData): Promise<AuthStat
     if (error.code === "email_exists" || /already (been )?registered/i.test(error.message)) {
       return { fieldErrors: { email: "An account with this email already exists. Sign in instead." } };
     }
-    // Most likely a username claimed between our check and the insert.
+    // Likely a username race between our check and the insert.
     if (/database error/i.test(error.message)) {
       return { error: "Couldn't create your account. That username may have just been taken; try another." };
     }
@@ -103,7 +101,6 @@ export async function signUp(_: AuthState, formData: FormData): Promise<AuthStat
   redirect(project ? `/p/${project.slug}/dashboard` : "/projects");
 }
 
-/** Resolve "email or username" to an email address. */
 async function emailFor(identifier: string): Promise<string | null> {
   if (identifier.includes("@")) return identifier;
   if (!process.env.SUPABASE_SECRET_KEY) return null;

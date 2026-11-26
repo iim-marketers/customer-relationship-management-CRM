@@ -34,7 +34,6 @@ function useActive(base: string) {
   return (href: string) => pathname === `${base}/${href}` || pathname.startsWith(`${base}/${href}/`);
 }
 
-/** Odoo-style systray: activities clock with a red counter. */
 function ActivityMenu({ base, alerts }: { base: string; alerts: ShellProps["alerts"] }) {
   const count = alerts.overdueFollowUps + alerts.overdueTasks;
   const rows = [

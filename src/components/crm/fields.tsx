@@ -33,7 +33,6 @@ export function TextAreaField({ label, name, className, ...props }: { label: str
   );
 }
 
-/** Form-bound select. Radix renders a hidden native <select name=…>; "none" → null on the server. */
 export function SelectField({
   label,
   name,

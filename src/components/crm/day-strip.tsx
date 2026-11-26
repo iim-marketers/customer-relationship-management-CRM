@@ -11,7 +11,6 @@ import { cn } from "@/lib/utils";
 
 const DOW = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 
-/** Week strip with a dot under days that have items. Selected day lives in ?date= */
 export function DayStrip({ selected, today, marked = [] }: { selected: string; today: string; marked?: string[] }) {
   const router = useRouter();
   const pathname = usePathname();

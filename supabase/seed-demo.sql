@@ -1,13 +1,6 @@
--- =============================================================================
--- Demo data for one project — handy for trying the CRM.
---
 -- 1. Sign up in the app (this creates your project).
 -- 2. Replace 'your-project-slug' below with your project's slug (see /projects).
 -- 3. Run this whole file in Supabase → SQL Editor.
---
--- Creates ~150 leads over the last 60 days, follow-ups, appointments, tasks,
--- call logs, and converts the leads sitting in your "won" stage.
--- =============================================================================
 do $$
 declare
   v_slug    text := 'your-project-slug';
@@ -26,7 +19,6 @@ begin
     raise exception 'No project with slug %. Edit v_slug at the top of this script.', v_slug;
   end if;
 
-  -- A couple of extra branches and services so filters have something to show.
   insert into public.branches (project_id, name, code, city)
   values (v_project, 'City Centre', 'CC', 'Bengaluru'), (v_project, 'Lakeside', 'LS', 'Bengaluru')
   on conflict do nothing;
@@ -35,7 +27,6 @@ begin
          (v_project, 'Premium Package', 'Package')
   on conflict do nothing;
 
-  -- Leads (row-correlated subqueries pick a random stage/source/etc. per row).
   insert into public.leads (project_id, name, phone, stage_id, source_id, service_id, branch_id, assigned_to,
                             notes, enquiry_count, created_at, last_enquiry_at, follow_up_at)
   select v_project,
@@ -54,7 +45,6 @@ begin
   from generate_series(1, 150) g,
        lateral (select now() - (random() * interval '60 days') as t) ts;
 
-  -- Follow-ups for open leads: some overdue, some upcoming.
   update public.leads l
      set follow_up_at = date_trunc('hour', now()) + ((floor(random() * 12) - 4) * interval '1 day')
                         + (floor(random() * 9) * interval '1 hour')
@@ -62,7 +52,6 @@ begin
      and l.stage_id in (select id from public.lead_stages where project_id = v_project and kind = 'open')
      and random() < 0.5;
 
-  -- Convert leads sitting in the won stage into contacts.
   for r in
     select l.id from public.leads l join public.lead_stages s on s.id = l.stage_id
     where l.project_id = v_project and s.kind = 'won' and l.contact_id is null
@@ -70,7 +59,6 @@ begin
     perform public.convert_lead(r.id);
   end loop;
 
-  -- Appointments around today.
   insert into public.appointments (project_id, lead_id, contact_id, branch_id, service_id, assigned_to,
                                    scheduled_at, duration_minutes, status)
   select v_project, l.id, l.contact_id, l.branch_id, l.service_id, l.assigned_to,
@@ -80,7 +68,6 @@ begin
   from public.leads l
   where l.project_id = v_project and random() < 0.3;
 
-  -- Tasks.
   insert into public.tasks (project_id, title, due_at, lead_id, assigned_to, created_by, completed_at)
   select v_project,
          (array['Call back with pricing','Send treatment brochure','Confirm appointment','Check on recovery'])[1 + floor(random() * 4)::int],
@@ -90,7 +77,6 @@ begin
   from public.leads l
   where l.project_id = v_project and random() < 0.12;
 
-  -- Call logs.
   insert into public.call_logs (project_id, lead_id, contact_name, phone, direction, status, agent_status,
                                 handled_by, branch_id, duration_seconds, called_at)
   select v_project, l.id, l.name, l.phone,

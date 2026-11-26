@@ -20,7 +20,6 @@ export type ForgotState =
   | ({ step: "code"; email: string; sentAt: number } & Feedback)
   | { step: "done"; message: string };
 
-/** One action for the whole flow, so the form keeps a single piece of state. */
 export async function forgotPassword(prev: ForgotState, formData: FormData): Promise<ForgotState> {
   const intent = formData.get("intent");
   if (intent === "reset") return resetPassword(prev, formData);
@@ -44,7 +43,7 @@ async function findUser(email: string) {
   return data;
 }
 
-/** Step 1 (and "resend"): email a 6-digit code. Reports success either way so emails can't be probed. */
+// Reports success either way so emails can't be probed.
 async function requestCode(prev: ForgotState, formData: FormData): Promise<ForgotState> {
   const isResend = prev.step === "code";
   const back = (f: Feedback): ForgotState =>
@@ -84,7 +83,6 @@ async function requestCode(prev: ForgotState, formData: FormData): Promise<Forgo
 
   const code = String(randomInt(0, 10 ** OTP_LENGTH)).padStart(OTP_LENGTH, "0");
 
-  // Only the newest code is ever valid.
   await admin.from("password_reset_codes").update({ used_at: new Date().toISOString() }).eq("user_id", user.id).is("used_at", null);
   const { data: row, error } = await admin
     .from("password_reset_codes")
@@ -121,7 +119,6 @@ const resetSchema = z
   })
   .refine((d) => d.password === d.confirm_password, { path: ["confirm_password"], message: "Passwords don't match" });
 
-/** Step 2: check the code, set the new password and sign the user in. */
 async function resetPassword(prev: ForgotState, formData: FormData): Promise<ForgotState> {
   const sentAt = prev.step === "code" ? prev.sentAt : 0;
   const email = String(formData.get("email") ?? "");
@@ -154,7 +151,7 @@ async function resetPassword(prev: ForgotState, formData: FormData): Promise<For
     return fail({ fieldErrors: { code: "Too many wrong attempts. Request a new code below." } });
   }
 
-  // Count the attempt before checking it. Matching on the old count makes parallel guesses lose.
+  // Count before comparing; matching on the old count makes parallel guesses lose.
   const { data: counted } = await admin
     .from("password_reset_codes")
     .update({ attempts: entry.attempts + 1 })
@@ -186,7 +183,7 @@ async function resetPassword(prev: ForgotState, formData: FormData): Promise<For
   const done: ForgotState = { step: "done", message: "Your password has been updated. Sign in with your new password." };
   if (signInError) return done;
 
-  // Redirects into the app. Only returns if a branded project login refused this account.
+  // Only returns if a branded project login refused this account.
   const projectSlug = String(formData.get("project") ?? "") || null;
   const { error: accessError } = await enterApp(supabase, data.user.id, projectSlug, null);
   return { ...done, message: `Your password has been updated, but ${accessError.charAt(0).toLowerCase()}${accessError.slice(1)}` };

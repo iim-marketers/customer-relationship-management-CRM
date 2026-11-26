@@ -45,7 +45,6 @@ export default function LeadsPage(props: Props) {
   );
 }
 
-/** Base leads query with the URL filters applied. */
 function leadQuery(ctx: ProjectContext, sp: SP, range: { from: Date | null; to: Date | null }) {
   let q = ctx.supabase.from("leads").select(LEAD_LIST_COLS, { count: "exact" }).eq("project_id", ctx.project.id);
   if (sp.branch) q = q.eq("branch_id", sp.branch);

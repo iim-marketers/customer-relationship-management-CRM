@@ -4,7 +4,6 @@ import { useTransition } from "react";
 import { toast } from "sonner";
 import type { ActionResult } from "@/lib/types";
 
-/** Runs a server action in a transition and toasts its result. */
 export function useAction() {
   const [pending, start] = useTransition();
   const run = <T,>(fn: () => Promise<ActionResult<T>>, onOk?: (r: Extract<ActionResult<T>, { ok: true }>) => void) =>
@@ -23,7 +22,7 @@ export function useAction() {
   return { pending, run };
 }
 
-/** onSubmit handler that collects FormData without React's auto form reset (keeps input on errors). */
+// Avoids React's automatic form reset so inputs survive errors.
 export function onSubmitForm(fn: (fd: FormData) => unknown) {
   return (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

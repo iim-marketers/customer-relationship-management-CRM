@@ -14,11 +14,6 @@ export type FilterDef = {
   options: { value: string; label: string }[];
 };
 
-/**
- * Odoo-style search box: active filters show as facets inside the box, the caret
- * opens the filter panel, and typing + Enter runs a project-wide search.
- * Filters live in the URL so they survive refresh and sharing.
- */
 export function FilterBar({ filters, className, keep = [] }: { filters: FilterDef[]; className?: string; keep?: string[] }) {
   const router = useRouter();
   const pathname = usePathname();

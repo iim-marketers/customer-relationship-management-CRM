@@ -17,11 +17,6 @@ export function Wordmark({ className }: { className?: string }) {
   );
 }
 
-/**
- * Tracks page scroll for the header:
- * - `atTop`: page hasn't scrolled, so the header sits flat with no border.
- * - `hidden`: user is scrolling down past the header, so it slides away; any upward scroll brings it back.
- */
 function useScrollHeader(revealOffset = 64, jitter = 6) {
   const [state, setState] = useState({ atTop: true, hidden: false });
   const lastY = useRef(0);
@@ -52,7 +47,6 @@ function useScrollHeader(revealOffset = 64, jitter = 6) {
   return state;
 }
 
-/** Marketing-site header: wordmark on the left, theme / sign in / get started on the right. */
 export function SiteHeader() {
   const { atTop, hidden } = useScrollHeader();
 

@@ -140,7 +140,6 @@ async function Reports({ params, searchParams }: { params: Params; searchParams:
   );
 }
 
-/** Horizontal bars aligned in a list: name, bar, figure. Hover shows the detail. */
 function MeterList({
   rows,
   max,
@@ -207,7 +206,6 @@ function BreakdownTable({ rows, label }: { rows: Row[]; label: string }) {
   );
 }
 
-/** Zero-fill missing days so the line doesn't skip gaps. Caps at 366 points. */
 function fillDays(rows: Report["daily"], from: string | null, to: string) {
   if (rows.length === 0) return [];
   const byDay = new Map(rows.map((r) => [r.day, r]));

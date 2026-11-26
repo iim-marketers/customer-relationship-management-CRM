@@ -44,7 +44,6 @@ export function PasswordStrength({ password }: { password: string }) {
   );
 }
 
-/** "Passwords match" / "don't match" hint once the confirm field has input. */
 export function MatchHint({ password, confirm }: { password: string; confirm: string }) {
   if (!confirm) return null;
   const match = password === confirm;
@@ -82,7 +81,6 @@ export function FormAlert({ tone = "error", children }: { tone?: "error" | "info
   );
 }
 
-/** Track which server-reported field errors the user has since edited, so they disappear on change. */
 export function useFieldErrors(fieldErrors: Partial<Record<string, string>> | undefined) {
   const [source, setSource] = useState(fieldErrors);
   const [cleared, setCleared] = useState<ReadonlySet<string>>(new Set());
