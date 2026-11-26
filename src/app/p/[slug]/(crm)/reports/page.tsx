@@ -1,3 +1,4 @@
+import { io } from "next/cache";
 import { ActivityIcon, CalendarXIcon, ClipboardListIcon, UserCheckIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
@@ -46,7 +47,9 @@ async function Reports({ params, searchParams }: { params: Params; searchParams:
   const sp = await searchParams;
   const ctx = await getProjectContext(slug);
   const lookups = await getLookups(slug);
-  const range = resolveRange(sp.range, ctx.tz, new Date());
+  await io();
+  const now = new Date();
+  const range = resolveRange(sp.range, ctx.tz, now);
 
   const { data, error } = await ctx.supabase.rpc("report_stats", {
     p_project: ctx.project.id,
@@ -80,7 +83,7 @@ async function Reports({ params, searchParams }: { params: Params; searchParams:
     );
   }
 
-  const daily = fillDays(r.daily, range.from ? ymdInTz(range.from, ctx.tz) : null, range.to ? addDaysYmd(ymdInTz(range.to, ctx.tz), -1) : ymdInTz(new Date(), ctx.tz));
+  const daily = fillDays(r.daily, range.from ? ymdInTz(range.from, ctx.tz) : null, range.to ? addDaysYmd(ymdInTz(range.to, ctx.tz), -1) : ymdInTz(now, ctx.tz));
   const funnelMax = Math.max(1, ...r.funnel.map((f) => f.count));
   const sourceMax = Math.max(1, ...r.sources.map((s) => s.count));
 

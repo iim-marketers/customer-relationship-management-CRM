@@ -24,7 +24,7 @@ export const getProjectContext = cache(async (slug: string) => {
     .eq("slug", slug)
     .maybeSingle<Project>();
 
-  if (!project) redirect(`/projects?denied=${encodeURIComponent(slug)}`);
+  if (!project) redirect("/projects");
 
   const { data: member } = await supabase
     .from("project_members")
@@ -33,7 +33,7 @@ export const getProjectContext = cache(async (slug: string) => {
     .eq("user_id", auth.user.id)
     .maybeSingle<{ role: MemberRole; branch_id: string | null; is_active: boolean; profile: Profile | null }>();
 
-  if (!member || !member.is_active) redirect(`/projects?denied=${encodeURIComponent(slug)}`);
+  if (!member || !member.is_active) redirect("/projects");
 
   const role = member.role;
   return {

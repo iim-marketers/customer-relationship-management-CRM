@@ -1,9 +1,11 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { io } from "next/cache";
 import { Suspense } from "react";
 import { AppShell } from "@/components/crm/app-shell";
 import { Skeleton } from "@/components/ui/skeleton";
 import { dayBounds, ymdInTz } from "@/lib/dates";
 import { getProjectContext } from "@/lib/project";
-import { ROLE_LABELS } from "@/lib/types";
+import { ROLE_LABELS, type Project } from "@/lib/types";
 import { readableOn } from "@/lib/utils";
 
 type Props = { children: React.ReactNode; params: Promise<{ slug: string }> };
@@ -20,6 +22,31 @@ async function Shell({ children, params }: Props) {
   const { slug } = await params;
   const { supabase, project, profile, user, role } = await getProjectContext(slug);
 
+  const brand = project.brand_color;
+  const style = brand
+    ? ({
+        "--primary": brand,
+        "--ring": brand,
+        "--sidebar-primary": brand,
+        "--primary-foreground": readableOn(brand),
+      } as React.CSSProperties)
+    : undefined;
+
+  return (
+    <div style={style}>
+      <AppShell
+        project={project}
+        user={{ name: profile?.full_name || user.email || "You", roleLabel: ROLE_LABELS[role] }}
+        alerts={loadAlerts(supabase, project)}
+      >
+        {children}
+      </AppShell>
+    </div>
+  );
+}
+
+async function loadAlerts(supabase: SupabaseClient, project: Pick<Project, "id" | "timezone">) {
+  await io();
   const now = new Date();
   const today = dayBounds(ymdInTz(now, project.timezone), project.timezone);
   const [followUps, tasks, appts] = await Promise.all([
@@ -44,31 +71,11 @@ async function Shell({ children, params }: Props) {
       .lt("scheduled_at", today.to.toISOString()),
   ]);
 
-  const brand = project.brand_color;
-  const style = brand
-    ? ({
-        "--primary": brand,
-        "--ring": brand,
-        "--sidebar-primary": brand,
-        "--primary-foreground": readableOn(brand),
-      } as React.CSSProperties)
-    : undefined;
-
-  return (
-    <div style={style}>
-      <AppShell
-        project={project}
-        user={{ name: profile?.full_name || user.email || "You", roleLabel: ROLE_LABELS[role] }}
-        alerts={{
-          overdueFollowUps: followUps.count ?? 0,
-          overdueTasks: tasks.count ?? 0,
-          todayAppointments: appts.count ?? 0,
-        }}
-      >
-        {children}
-      </AppShell>
-    </div>
-  );
+  return {
+    overdueFollowUps: followUps.count ?? 0,
+    overdueTasks: tasks.count ?? 0,
+    todayAppointments: appts.count ?? 0,
+  };
 }
 
 function ShellSkeleton() {

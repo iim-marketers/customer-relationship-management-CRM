@@ -1,3 +1,4 @@
+import { io } from "next/cache";
 import { CalendarCheckIcon, PlusIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -45,6 +46,7 @@ async function Appointments({ params, searchParams }: Props) {
   const lookups = await getLookups(slug);
   const cl = clientLookups(lookups);
 
+  await io();
   const now = new Date();
   const today = ymdInTz(now, tz);
   const selected = isYmd(sp.date) ? sp.date : today;

@@ -1,3 +1,4 @@
+import { io } from "next/cache";
 import { KanbanSquareIcon, ListIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -64,6 +65,7 @@ async function Leads({ params, searchParams }: Props) {
   const lookups = await getLookups(slug);
   const cl = clientLookups(lookups);
   const view = sp.view === "list" ? "list" : "kanban";
+  await io();
   const now = new Date();
   const range = resolveRange(sp.range, ctx.tz, now);
   const today = dayBounds(ymdInTz(now, ctx.tz), ctx.tz);

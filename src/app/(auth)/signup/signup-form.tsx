@@ -56,7 +56,6 @@ export function SignupForm() {
     signUp,
     undefined,
   );
-  // Controlled, so nothing is wiped when the server sends back an error.
   const [values, setValues] = useState<Values>(EMPTY);
   const [availability, setAvailability] = useState<Availability | null>(null);
   const errors = useFieldErrors(state?.fieldErrors);

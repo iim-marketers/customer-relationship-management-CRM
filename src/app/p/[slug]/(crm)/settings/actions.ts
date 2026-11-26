@@ -15,7 +15,7 @@ async function run<T>(fn: () => Promise<ActionResult<T>>): Promise<ActionResult<
     if (result.ok) refresh();
     return result;
   } catch (e) {
-    unstable_rethrow(e); // let redirect()/notFound() through
+    unstable_rethrow(e);
     return { ok: false, error: e instanceof Error ? e.message : "Something went wrong" };
   }
 }
@@ -35,7 +35,7 @@ export async function updateProjectProfile(slug: string, formData: FormData) {
     if (!name || name.length < 2) return { ok: false, error: "Project name must be at least 2 characters" };
 
     const brand = str(formData.get("brand_color"));
-    if (brand && !/^#[0-9a-fA-F]{6}$/.test(brand)) return { ok: false, error: "Brand colour must be a hex value like #a08a5c" };
+    if (brand && !/^#[0-9a-fA-F]{6}$/.test(brand)) return { ok: false, error: "Brand colour must be a hex value like #714b67" };
 
     const timezone = str(formData.get("timezone")) ?? ctx.project.timezone;
     try {
@@ -68,11 +68,28 @@ export async function deleteProject(slug: string, confirmSlug: string) {
     const ctx = await authorizeProject(slug, { admin: true });
     if (ctx.role !== "owner") return { ok: false, error: "Only owners can delete a project." };
     if (confirmSlug.trim() !== ctx.project.slug) return { ok: false, error: "Type the project slug exactly to confirm." };
+    if (!process.env.SUPABASE_SECRET_KEY) {
+      return { ok: false, error: "Deleting a CRM needs SUPABASE_SECRET_KEY in your environment (.env). Add it and restart the server." };
+    }
+    const admin = createAdminClient();
+
+    const { data: members, error: membersError } = await admin
+      .from("project_members")
+      .select("user_id")
+      .eq("project_id", ctx.project.id);
+    if (membersError) return { ok: false, error: membersError.message };
+
     const { error } = await ctx.supabase.from("projects").delete().eq("id", ctx.project.id);
     if (error) return { ok: false, error: error.message };
+
+    await ctx.supabase.auth.signOut();
+    for (const { user_id } of members ?? []) {
+      const { error: userError } = await admin.auth.admin.deleteUser(user_id);
+      if (userError) console.error(`deleteProject: couldn't delete user ${user_id}:`, userError.message);
+    }
     return { ok: true };
   });
-  if (result.ok) redirect("/projects");
+  if (result.ok) redirect("/");
   return result;
 }
 
@@ -107,13 +124,20 @@ export async function addMember(slug: string, formData: FormData) {
     let userId = existing?.id as string | undefined;
 
     if (userId) {
-      const { data: already } = await admin
+      const { data: membership } = await admin
         .from("project_members")
-        .select("user_id")
-        .eq("project_id", ctx.project.id)
+        .select("project_id")
         .eq("user_id", userId)
         .maybeSingle();
-      if (already) return { ok: false, error: "That person is already a member of this project." };
+      if (membership) {
+        return {
+          ok: false,
+          error:
+            membership.project_id === ctx.project.id
+              ? "That person is already a member of this CRM."
+              : "That email is already used by another CRM. Each login belongs to one CRM, so use a different email.",
+        };
+      }
     } else {
       if (password.length < 8) return { ok: false, error: "New users need a password of at least 8 characters" };
       const { data, error } = await admin.auth.admin.createUser({
@@ -135,7 +159,7 @@ export async function addMember(slug: string, formData: FormData) {
     if (error) return { ok: false, error: error.message };
     return {
       ok: true,
-      message: existing ? "Existing user added to this project" : `Account created — they can sign in at /p/${ctx.project.slug}/login`,
+      message: existing ? "Existing login added to this CRM" : `Account created — they can sign in at /p/${ctx.project.slug}/login`,
     };
   });
 }
@@ -224,7 +248,7 @@ export async function saveMasterRecord(slug: string, table: MasterTable, id: str
     const values = masterValues(table, formData);
     if (!values.name) return { ok: false, error: "Name is required" };
     if (table === "lead_stages" && values.color && !/^#[0-9a-fA-F]{6}$/.test(String(values.color))) {
-      return { ok: false, error: "Colour must be a hex value like #a08a5c" };
+      return { ok: false, error: "Colour must be a hex value like #714b67" };
     }
 
     if (id) {

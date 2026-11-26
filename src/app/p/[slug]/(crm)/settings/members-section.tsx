@@ -59,7 +59,7 @@ function AddMemberDialog({ slug, branches }: { slug: string; branches: Branch[] 
         <DialogHeader>
           <DialogTitle>Add team member</DialogTitle>
           <DialogDescription>
-            Creates a login for them. If the email already has an account, they&apos;re simply added to this project (password is ignored).
+            Creates a login for this CRM. Each login belongs to one CRM, so use an email that isn&apos;t already signed up elsewhere.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={onSubmitForm((fd) => run(() => addMember(slug, fd), () => setOpen(false)))} className="grid gap-4 sm:grid-cols-2">

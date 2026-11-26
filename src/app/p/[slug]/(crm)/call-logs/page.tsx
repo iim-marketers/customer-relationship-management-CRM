@@ -1,3 +1,4 @@
+import { io } from "next/cache";
 import { PhoneCallIcon, PlayCircleIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -37,6 +38,7 @@ async function CallLogs({ params, searchParams }: { params: Params; searchParams
   const sp = await searchParams;
   const ctx = await getProjectContext(slug);
   const lookups = await getLookups(slug);
+  await io();
   const now = new Date();
   const range = resolveRange(sp.range, ctx.tz, now);
   const { page, from, to } = pageWindow(sp.page);

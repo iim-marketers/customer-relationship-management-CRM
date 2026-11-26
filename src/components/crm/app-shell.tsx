@@ -1,10 +1,10 @@
 "use client";
 
-import { ClockIcon, LayoutGridIcon, LogOutIcon, MenuIcon, MoonIcon, SearchIcon, SunIcon } from "lucide-react";
+import { ClockIcon, LogOutIcon, MenuIcon, MoonIcon, SearchIcon, SunIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { useRef, useState } from "react";
+import { Suspense, use, useRef, useState } from "react";
 import { signOut } from "@/app/(auth)/actions";
 import { ProjectLogo } from "@/components/crm/project-logo";
 import { navItems } from "@/components/crm/nav";
@@ -22,10 +22,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn, initials } from "@/lib/utils";
 
+type Alerts = { overdueFollowUps: number; overdueTasks: number; todayAppointments: number };
+
 type ShellProps = {
   project: { name: string; slug: string; logo_url: string | null; brand_color: string | null; contact_label: string };
   user: { name: string; roleLabel: string };
-  alerts: { overdueFollowUps: number; overdueTasks: number; todayAppointments: number };
+  alerts: Promise<Alerts>;
   children: React.ReactNode;
 };
 
@@ -34,7 +36,22 @@ function useActive(base: string) {
   return (href: string) => pathname === `${base}/${href}` || pathname.startsWith(`${base}/${href}/`);
 }
 
-function ActivityMenu({ base, alerts }: { base: string; alerts: ShellProps["alerts"] }) {
+function ActivityMenu({ base, alerts }: { base: string; alerts: Promise<Alerts> }) {
+  return (
+    <Suspense
+      fallback={
+        <Button variant="ghost" size="icon" aria-label="Activities" disabled>
+          <ClockIcon />
+        </Button>
+      }
+    >
+      <ActivityMenuContent base={base} alerts={alerts} />
+    </Suspense>
+  );
+}
+
+function ActivityMenuContent({ base, alerts: alertsPromise }: { base: string; alerts: Promise<Alerts> }) {
+  const alerts = use(alertsPromise);
   const count = alerts.overdueFollowUps + alerts.overdueTasks;
   const rows = [
     { n: alerts.overdueFollowUps, label: "Overdue follow-ups", href: `${base}/todo`, tone: "late" },
@@ -96,11 +113,6 @@ function UserMenu({ user, slug }: { user: ShellProps["user"]; slug: string }) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/projects">
-            <LayoutGridIcon /> Switch project
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
           <Link href={`/p/${slug}/settings`}>Preferences</Link>
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}>
@@ -155,18 +167,9 @@ export function AppShell({ project, user, alerts, children }: ShellProps) {
                   {item.label}
                 </Link>
               ))}
-              <Link href="/projects" className="mt-2 flex items-center gap-3 rounded-md border-t px-3 py-2.5 pt-3 text-sm text-muted-foreground hover:text-foreground">
-                <LayoutGridIcon className="size-4" /> Switch project
-              </Link>
             </nav>
           </SheetContent>
         </Sheet>
-
-        <Button variant="ghost" size="icon" className="hidden lg:inline-flex" aria-label="All projects" title="All projects" asChild>
-          <Link href="/projects">
-            <LayoutGridIcon />
-          </Link>
-        </Button>
 
         <Link href={`${base}/dashboard`} className="flex min-w-0 items-center gap-2 rounded-md px-2 py-1 hover:bg-muted">
           <ProjectLogo project={project} className="size-6 rounded-md text-[10px]" />
