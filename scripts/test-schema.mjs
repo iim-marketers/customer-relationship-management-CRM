@@ -36,6 +36,26 @@ projects.length === 2 && projects[0].slug === "adyant-ayurveda" && projects[1].s
 
 const pa = (await db.query(`select id from projects where created_by=$1`, [alice.id])).rows[0].id;
 
+// Usernames
+const { rows: [carol] } = await db.query(`insert into auth.users (email, raw_user_meta_data) values ('carol@z.com', '{"full_name":"Carol","username":"Carol_1"}') returning id`);
+const cu = (await db.query(`select username from profiles where id=$1`, [carol.id])).rows[0].username;
+cu === "carol_1" ? ok("signup stores lowercased username") : fail("username: " + cu);
+(await db.query(`select username from profiles where id=$1`, [alice.id])).rows[0].username === null ? ok("username is optional") : fail("username should be null");
+try { await db.query(`insert into auth.users (email, raw_user_meta_data) values ('dup@z.com', '{"username":"carol_1"}')`); fail("duplicate username allowed"); } catch { ok("duplicate username rejected"); }
+try { await db.query(`update profiles set username='no spaces!' where id=$1`, [carol.id]); fail("bad username allowed"); } catch { ok("username format enforced"); }
+
+const byName = (await db.query(`select * from find_auth_user(null, 'CAROL_1')`)).rows[0];
+const byMail = (await db.query(`select * from find_auth_user('Carol@Z.com')`)).rows[0];
+byName?.email === "carol@z.com" && byMail?.id === carol.id ? ok("find_auth_user by username and email") : fail(JSON.stringify([byName, byMail]));
+await asUser(carol.id, `update profiles set email='alice@x.com' where id=$1`, [carol.id]);
+(await db.query(`select * from find_auth_user('alice@x.com')`)).rows[0]?.id === alice.id ? ok("find_auth_user ignores edited profile emails") : fail("lookup spoofable");
+try { await asUser(alice.id, `select * from find_auth_user('carol@z.com')`); fail("users can call find_auth_user"); } catch { ok("find_auth_user is server-only"); }
+
+// Reset codes are server-only
+await db.query(`insert into password_reset_codes (user_id, code_hash, expires_at) values ($1, 'x', now() + interval '10 minutes')`, [alice.id]);
+const leaked = await asUser(alice.id, `select count(*)::int n from password_reset_codes`);
+leaked.rows[0].n === 0 ? ok("password_reset_codes hidden from users (RLS)") : fail("reset codes readable by users");
+
 
 // Isolation
 const seen = await asUser(alice.id, `select id from projects`);

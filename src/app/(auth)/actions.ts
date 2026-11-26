@@ -1,58 +1,101 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { contactLabelFor } from "@/lib/industries";
+import { enterApp } from "@/lib/enter-app";
+import {
+  emailSchema,
+  fieldErrorsFrom,
+  passwordSchema,
+  usernameSchema,
+  type FieldErrors,
+} from "@/lib/auth-rules";
 
-export type AuthState = { error?: string; message?: string; email?: string } | undefined;
+export type AuthState = { error?: string; fieldErrors?: FieldErrors } | undefined;
 
-const signUpSchema = z.object({
-  full_name: z.string().trim().min(2, "Enter your name"),
-  email: z.email("Enter a valid email").trim().toLowerCase(),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  project_name: z.string().trim().min(2, "Project name must be at least 2 characters").max(80),
-  industry: z.string().trim().optional(),
-});
+const signUpSchema = z
+  .object({
+    full_name: z.string().trim().min(2, "Enter your name").max(80),
+    username: usernameSchema,
+    email: emailSchema,
+    password: passwordSchema,
+    confirm_password: z.string(),
+    project_name: z.string().trim().min(2, "Project name must be at least 2 characters").max(80),
+    industry: z.string().trim().optional(),
+  })
+  .refine((d) => d.password === d.confirm_password, {
+    path: ["confirm_password"],
+    message: "Passwords don't match",
+  });
 
-async function siteUrl() {
-  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
-  const h = await headers();
-  return `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host")}`;
-}
+const MISSING_SECRET =
+  "Sign-up isn't configured yet: SUPABASE_SECRET_KEY is missing from the server environment.";
 
 function safeNext(next: FormDataEntryValue | null) {
   const n = typeof next === "string" ? next : "";
   return n.startsWith("/") && !n.startsWith("//") ? n : null;
 }
 
+async function isUsernameTaken(username: string) {
+  const { data } = await createAdminClient().from("profiles").select("id").eq("username", username).maybeSingle();
+  return Boolean(data);
+}
+
+/** Live check for the signup form. */
+export async function checkUsername(raw: string): Promise<{ available: boolean; error?: string }> {
+  const parsed = usernameSchema.safeParse(raw);
+  if (!parsed.success) return { available: false, error: parsed.error.issues[0].message };
+  if (!process.env.SUPABASE_SECRET_KEY) return { available: true };
+  return (await isUsernameTaken(parsed.data))
+    ? { available: false, error: "That username is taken" }
+    : { available: true };
+}
+
 export async function signUp(_: AuthState, formData: FormData): Promise<AuthState> {
   const parsed = signUpSchema.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) return { error: parsed.error.issues[0].message };
-  const { full_name, email, password, project_name, industry } = parsed.data;
+  if (!parsed.success) return { fieldErrors: fieldErrorsFrom(parsed.error) };
+  const { full_name, username, email, password, project_name, industry } = parsed.data;
 
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({
+  if (!process.env.SUPABASE_SECRET_KEY) return { error: MISSING_SECRET };
+  if (await isUsernameTaken(username)) return { fieldErrors: { username: "That username is taken" } };
+
+  // Created with the secret key and pre-confirmed, so there's no email verification step
+  // regardless of the project's "Confirm email" setting.
+  const { error } = await createAdminClient().auth.admin.createUser({
     email,
     password,
-    options: {
-      // The on_auth_user_created trigger reads these and creates the project.
-      data: { full_name, project_name, industry: industry || null, contact_label: contactLabelFor(industry) },
-      emailRedirectTo: `${await siteUrl()}/auth/confirm?next=/projects`,
+    email_confirm: true,
+    // The on_auth_user_created trigger reads these to create the profile and the project.
+    user_metadata: {
+      full_name,
+      username,
+      project_name,
+      industry: industry || null,
+      contact_label: contactLabelFor(industry),
     },
   });
-  if (error) return { error: error.message };
-
-  // Email confirmation is on: the project already exists, they just need to verify.
-  if (!data.session) {
-    return { message: "Check your inbox to confirm your email, then sign in.", email };
+  if (error) {
+    if (error.code === "email_exists" || /already (been )?registered/i.test(error.message)) {
+      return { fieldErrors: { email: "An account with this email already exists. Sign in instead." } };
+    }
+    // Most likely a username claimed between our check and the insert.
+    if (/database error/i.test(error.message)) {
+      return { error: "Couldn't create your account. That username may have just been taken; try another." };
+    }
+    return { error: error.message };
   }
+
+  const supabase = await createClient();
+  const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+  if (signInError) redirect("/login");
 
   const { data: project } = await supabase
     .from("projects")
     .select("slug")
-    .eq("created_by", data.user!.id)
+    .eq("created_by", data.user.id)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -60,36 +103,37 @@ export async function signUp(_: AuthState, formData: FormData): Promise<AuthStat
   redirect(project ? `/p/${project.slug}/dashboard` : "/projects");
 }
 
+/** Resolve "email or username" to an email address. */
+async function emailFor(identifier: string): Promise<string | null> {
+  if (identifier.includes("@")) return identifier;
+  if (!process.env.SUPABASE_SECRET_KEY) return null;
+  const { data } = await createAdminClient()
+    .rpc("find_auth_user", { p_username: identifier })
+    .maybeSingle<{ email: string }>();
+  return data?.email ?? null;
+}
+
 export async function signIn(_: AuthState, formData: FormData): Promise<AuthState> {
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const identifier = String(formData.get("identifier") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
   const projectSlug = String(formData.get("project") ?? "") || null;
-  if (!email || !password) return { error: "Enter your email and password" };
+  if (!identifier || !password) return { error: "Enter your email or username and your password" };
+
+  const email = await emailFor(identifier);
+  if (!email) return { error: "Incorrect username or password" };
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return { error: error.message === "Invalid login credentials" ? "Incorrect email or password" : error.message };
-
-  // Branded project login: only let members of that project in.
-  if (projectSlug) {
-    const { data: project } = await supabase.from("projects").select("id").eq("slug", projectSlug).maybeSingle();
-    if (!project) {
-      await supabase.auth.signOut();
-      return { error: "This account doesn't have access to this project." };
-    }
-    redirect(safeNext(formData.get("next")) ?? `/p/${projectSlug}/dashboard`);
+  if (error) {
+    return {
+      error:
+        error.message === "Invalid login credentials"
+          ? `Incorrect ${identifier.includes("@") ? "email" : "username"} or password`
+          : error.message,
+    };
   }
 
-  const next = safeNext(formData.get("next"));
-  if (next) redirect(next);
-
-  const { data: memberships } = await supabase
-    .from("project_members")
-    .select("project:projects(slug)")
-    .eq("user_id", data.user.id)
-    .eq("is_active", true);
-  const slugs = (memberships ?? []).map((m) => (m.project as unknown as { slug: string } | null)?.slug).filter(Boolean);
-  redirect(slugs.length === 1 ? `/p/${slugs[0]}/dashboard` : "/projects");
+  return enterApp(supabase, data.user.id, projectSlug, safeNext(formData.get("next")));
 }
 
 export async function signOut(formData?: FormData) {

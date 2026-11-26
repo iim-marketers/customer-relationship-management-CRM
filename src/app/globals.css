@@ -3,6 +3,12 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
+/* Laptop screens with little vertical room (e.g. 1366×768 minus browser chrome). */
+@custom-variant short {
+  @media (max-height: 760px) {
+    @slot;
+  }
+}
 
 @theme inline {
   --color-background: var(--background);

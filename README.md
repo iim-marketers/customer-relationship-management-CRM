@@ -8,8 +8,9 @@ settings and a branded login page. One person can belong to many projects and sw
 
 | Area | What it does |
 | --- | --- |
-| **Sign up** | One form: project name, industry, your name, email, password. A database trigger creates the project with a default pipeline, lead sources and branch. |
-| **Login** | `/login` (all projects) and a branded `/p/<slug>/login` per project that only lets that project's members in. |
+| **Sign up** | One form: project name, industry, your name, username, email, password and confirmation. No email verification step: the account is created confirmed and you land in your new project. A database trigger creates the project with a default pipeline, lead sources and branch. |
+| **Login** | Email or username. `/login` (all projects) and a branded `/p/<slug>/login` per project that only lets that project's members in. |
+| **Forgot password** | `/forgot-password` emails a 6-digit code (via Resend). The code is valid for 10 minutes and allows 5 tries; then the user sets a new password and is signed in. |
 | **Dashboard** | KPIs, stage pipeline, repeat enquiries, follow-up queue, upcoming appointments, newest leads. |
 | **To-Do** | Week strip, overdue section, follow-ups + tasks per day, stage chips, snooze. |
 | **Leads** | Kanban with drag-and-drop between stages, or a paginated list. Filters for status, branch, assignee, source, service and date range. Same phone number = repeat enquiry, not a duplicate. |
@@ -36,9 +37,8 @@ In **Authentication → URL Configuration**:
 - **Site URL**: `http://localhost:3000` (your production URL later)
 - **Redirect URLs**: add `http://localhost:3000/auth/confirm`
 
-Optional: for the fastest local testing, turn off **Authentication → Providers → Email → Confirm email**.
-Sign-up then takes you straight into your new project. With it on, users confirm by email first.
-Their project is already created and waiting.
+Sign-up creates users with the secret key as already confirmed, so the **Confirm email** setting doesn't
+affect it. Password resets use this app's own codes sent through Resend, not Supabase's email templates.
 
 ### 3. Environment
 ```bash
@@ -49,7 +49,8 @@ Copy the values from **Project Settings → API Keys**:
 | Variable | Needed for |
 | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Everything |
-| `SUPABASE_SECRET_KEY` | Adding team members (it creates their login) and the lead webhook. Server-only, so never expose it. |
+| `SUPABASE_SECRET_KEY` | Sign-up, sign-in by username, password reset, adding team members and the lead webhook. Server-only, so never expose it. |
+| `RESEND_API_KEY`, `RESEND_FROM_EMAIL` | Password reset emails. The sender must be on a domain verified in Resend. |
 | `DATABASE_URL` | `npm run db:migrate` (Supabase CLI). Not used by the app at runtime. |
 | `NEXT_PUBLIC_SITE_URL` | Links in confirmation emails |
 
