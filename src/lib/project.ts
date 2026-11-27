@@ -16,7 +16,7 @@ export const requireUser = cache(async (next?: string) => {
 export const getProjectContext = cache(async (slug: string) => {
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) redirect(`/p/${slug}/login`);
+  if (!auth.user) redirect(`/login?next=${encodeURIComponent(`/p/${slug}/dashboard`)}`);
 
   const { data: project } = await supabase
     .from("projects")

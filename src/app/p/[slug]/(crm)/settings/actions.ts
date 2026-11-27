@@ -155,7 +155,7 @@ export async function addMember(slug: string, formData: FormData) {
     if (error) return { ok: false, error: error.message };
     return {
       ok: true,
-      message: existing ? "Existing login added to this CRM" : `Account created — they can sign in at /p/${ctx.project.slug}/login`,
+      message: existing ? "Existing login added to this CRM" : "Account created — they can sign in at /login",
     };
   });
 }

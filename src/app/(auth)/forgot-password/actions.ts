@@ -182,7 +182,5 @@ async function resetPassword(prev: ForgotState, formData: FormData): Promise<For
   const done: ForgotState = { step: "done", message: "Your password has been updated. Sign in with your new password." };
   if (signInError) return done;
 
-  const projectSlug = String(formData.get("project") ?? "") || null;
-  const { error: accessError } = await enterApp(supabase, data.user.id, projectSlug, null);
-  return { ...done, message: `Your password has been updated, but ${accessError.charAt(0).toLowerCase()}${accessError.slice(1)}` };
+  return enterApp(supabase, data.user.id, null);
 }

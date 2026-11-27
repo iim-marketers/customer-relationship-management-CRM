@@ -30,14 +30,11 @@ export async function updateSession(request: NextRequest) {
   const signedIn = Boolean(data?.claims);
   const { pathname, search } = request.nextUrl;
 
-  const projectMatch = pathname.match(/^\/p\/([^/]+)(\/.*)?$/);
-  const isProjectLogin = projectMatch && projectMatch[2]?.startsWith("/login");
-  const needsAuth =
-    pathname.startsWith("/projects") || (projectMatch && !isProjectLogin);
+  const needsAuth = pathname.startsWith("/projects") || pathname.startsWith("/p/");
 
   if (!signedIn && needsAuth) {
     const url = request.nextUrl.clone();
-    url.pathname = projectMatch ? `/p/${projectMatch[1]}/login` : "/login";
+    url.pathname = "/login";
     url.search = `?next=${encodeURIComponent(pathname + search)}`;
     const redirect = NextResponse.redirect(url);
     response.cookies.getAll().forEach((c) => redirect.cookies.set(c));

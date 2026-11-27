@@ -111,7 +111,6 @@ async function emailFor(identifier: string): Promise<string | null> {
 export async function signIn(_: AuthState, formData: FormData): Promise<AuthState> {
   const identifier = String(formData.get("identifier") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
-  const projectSlug = String(formData.get("project") ?? "") || null;
   if (!identifier || !password) return { error: "Enter your email or username and your password" };
 
   const email = await emailFor(identifier);
@@ -128,11 +127,10 @@ export async function signIn(_: AuthState, formData: FormData): Promise<AuthStat
     };
   }
 
-  return enterApp(supabase, data.user.id, projectSlug, safeNext(formData.get("next")));
+  return enterApp(supabase, data.user.id, safeNext(formData.get("next")));
 }
 
 export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  redirect("/");
 }

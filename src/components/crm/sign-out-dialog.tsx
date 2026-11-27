@@ -16,6 +16,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
+async function signOutAndGoHome() {
+  await signOut();
+  window.location.replace("/");
+}
+
+export function SignOutForm({ children }: { children: React.ReactNode }) {
+  return <form action={signOutAndGoHome}>{children}</form>;
+}
+
 export function SignOutDialog({
   open,
   onOpenChange,
@@ -35,12 +44,12 @@ export function SignOutDialog({
             You&apos;ll need to sign in again to access your dashboard.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <form action={signOut}>
+        <SignOutForm>
           <AlertDialogFooter>
             <AlertDialogCancel type="button">Cancel</AlertDialogCancel>
             <SubmitButton variant="destructive">Sign out</SubmitButton>
           </AlertDialogFooter>
-        </form>
+        </SignOutForm>
       </AlertDialogContent>
     </AlertDialog>
   );

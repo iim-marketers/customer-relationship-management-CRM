@@ -13,18 +13,8 @@ export async function crmSlugFor(supabase: SupabaseClient, userId: string): Prom
   return (data?.project as unknown as { slug: string } | null)?.slug ?? null;
 }
 
-export async function enterApp(
-  supabase: SupabaseClient,
-  userId: string,
-  projectSlug: string | null,
-  next: string | null,
-): Promise<{ error: string }> {
+export async function enterApp(supabase: SupabaseClient, userId: string, next: string | null): Promise<never> {
   const slug = await crmSlugFor(supabase, userId);
-
-  if (projectSlug && projectSlug !== slug) {
-    await supabase.auth.signOut();
-    return { error: "This account doesn't have access to this CRM." };
-  }
   if (!slug) redirect("/projects");
 
   redirect(next?.startsWith(`/p/${slug}/`) ? next : `/p/${slug}/dashboard`);
