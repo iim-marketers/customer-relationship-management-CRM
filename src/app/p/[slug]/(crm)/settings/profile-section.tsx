@@ -3,7 +3,6 @@
 import { TriangleAlertIcon } from "lucide-react";
 import { useState } from "react";
 import { SelectField, TextField } from "@/components/crm/fields";
-import { ProjectLogo } from "@/components/crm/project-logo";
 import { onSubmitForm, useAction } from "@/components/crm/use-action";
 import { SubmitButton } from "@/components/submit-button";
 import {
@@ -21,28 +20,16 @@ import { Input } from "@/components/ui/input";
 import { INDUSTRIES } from "@/lib/industries";
 import type { Project } from "@/lib/types";
 import { deleteProject, updateProjectProfile } from "./actions";
-import { CopyButton } from "./copy-button";
 import { TIMEZONES } from "./master-config";
 
 export function ProfileSection({ project, isAdmin, isOwner }: { project: Project; isAdmin: boolean; isOwner: boolean }) {
   const { pending, run } = useAction();
   const [logo, setLogo] = useState(project.logo_url ?? "");
   const [name, setName] = useState(project.name);
-  const loginPath = `/p/${project.slug}/login`;
   const zones = TIMEZONES.includes(project.timezone) ? TIMEZONES : [project.timezone, ...TIMEZONES];
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-4 rounded-xl border bg-muted/30 p-4">
-        <ProjectLogo project={{ name: name || project.name, logo_url: logo || null }} className="size-14" />
-        <div className="min-w-0 flex-1">
-          <div className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Team login page</div>
-          <div className="truncate font-mono text-sm">{loginPath}</div>
-          <p className="text-xs text-muted-foreground">Share this with your team — it shows your logo and only lets project members in.</p>
-        </div>
-        <CopyButton value={loginPath} label="Copy link" />
-      </div>
-
       <form onSubmit={onSubmitForm((fd) => run(() => updateProjectProfile(project.slug, fd)))} className="grid gap-4 sm:grid-cols-2">
         <fieldset disabled={!isAdmin} className="contents">
           <TextField label="Project name" name="name" required minLength={2} maxLength={80} value={name} onChange={(e) => setName(e.target.value)} />

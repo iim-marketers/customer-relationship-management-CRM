@@ -2,7 +2,6 @@
 
 import { ArrowLeftIcon, CheckCircle2Icon, KeyRoundIcon, MailIcon } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { forgotPassword, type ForgotState } from "./actions";
@@ -17,9 +16,7 @@ const RESEND_AFTER_SECONDS = 60;
 const primaryButton = "h-11 w-full bg-gradient-to-r from-primary/80 to-primary text-base font-semibold shadow-lg shadow-primary/20";
 
 export function ForgotPasswordForm() {
-  const params = useSearchParams();
-  const project = params.get("project") ?? "";
-  const loginHref = project ? `/p/${encodeURIComponent(project)}/login` : "/login";
+  const loginHref = "/login";
   const [state, action] = useActionState<ForgotState, FormData>(forgotPassword, { step: "email" });
 
   if (state.step === "done") {
@@ -40,7 +37,7 @@ export function ForgotPasswordForm() {
       {state.step === "email" ? (
         <EmailStep state={state} action={action} />
       ) : (
-        <CodeStep key={state.email} state={state} action={action} project={project} />
+        <CodeStep key={state.email} state={state} action={action} />
       )}
       <Link
         href={loginHref}
@@ -106,11 +103,9 @@ function EmailStep({ state, action }: { state: Extract<ForgotState, { step: "ema
 function CodeStep({
   state,
   action,
-  project,
 }: {
   state: Extract<ForgotState, { step: "code" }>;
   action: (fd: FormData) => void;
-  project: string;
 }) {
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
@@ -125,7 +120,6 @@ function CodeStep({
       </Header>
       <form action={action} className="space-y-4">
         <input type="hidden" name="email" value={state.email} />
-        <input type="hidden" name="project" value={project} />
         <div className="space-y-2">
           <Label htmlFor="code">Verification code</Label>
           <Input

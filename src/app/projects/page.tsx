@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { signOut } from "@/app/(auth)/actions";
 import { BrandMark } from "@/components/brand";
+import { SignOutForm } from "@/components/crm/sign-out-dialog";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { crmSlugFor } from "@/lib/enter-app";
@@ -43,11 +43,11 @@ async function NoCrm() {
         to start a new CRM.
       </p>
       <div className="mt-2 flex gap-2">
-        <form action={signOut}>
+        <SignOutForm>
           <Button variant="outline">
             <LogOutIcon /> Sign out
           </Button>
-        </form>
+        </SignOutForm>
         <Button asChild>
           <Link href="/signup">Sign up</Link>
         </Button>

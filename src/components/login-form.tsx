@@ -9,7 +9,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function LoginForm({ project }: { project?: string }) {
+export function LoginForm() {
   const params = useSearchParams();
   const [state, action] = useActionState<AuthState, FormData>(
     signIn,
@@ -17,14 +17,10 @@ export function LoginForm({ project }: { project?: string }) {
   );
   const [identifier, setIdentifier] = useState("");
   const error = state?.error ?? params.get("error");
-  const forgotHref = project
-    ? `/forgot-password?project=${encodeURIComponent(project)}`
-    : "/forgot-password";
 
   return (
     <form action={action} className="space-y-4">
       <input type="hidden" name="next" value={params.get("next") ?? ""} />
-      {project && <input type="hidden" name="project" value={project} />}
       <div className="space-y-2">
         <Label htmlFor="identifier">Email or username</Label>
         <Input
@@ -44,7 +40,7 @@ export function LoginForm({ project }: { project?: string }) {
         <div className="flex items-center justify-between">
           <Label htmlFor="password">Password</Label>
           <Link
-            href={forgotHref}
+            href="/forgot-password"
             className="text-sm font-medium text-primary hover:underline"
           >
             Forgot password?
