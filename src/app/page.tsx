@@ -177,8 +177,6 @@ export default function Home() {
   );
 }
 
-/* ── Landing-page mockup of the CRM dashboard (static, light theme, decorative) ── */
-
 const TEAL = "#0f766e";
 
 const MOCK_NAV = [
@@ -265,7 +263,6 @@ function DashboardMockup() {
       aria-hidden
       className="pointer-events-none flex overflow-hidden rounded-xl border border-black/5 bg-[#f9fafb] text-left text-[#1f2937] shadow-[0_30px_80px_-20px_rgba(17,24,39,0.35)] select-none"
     >
-      {/* Sidebar */}
       <div className="hidden w-[184px] shrink-0 flex-col border-r border-[#dee2e6] bg-white md:flex">
         <div className="flex h-11 items-center gap-2 border-b border-[#dee2e6] px-3">
           <span className="grid size-6 place-items-center rounded-md text-[9px] font-bold text-white" style={{ background: TEAL }}>
@@ -322,7 +319,6 @@ function DashboardMockup() {
         </div>
       </div>
 
-      {/* Main */}
       <div className="min-w-0 flex-1">
         <div className="flex h-11 items-center gap-2 border-b border-[#dee2e6] bg-white px-3 text-[12px]">
           <PanelLeftIcon className="size-3.5 text-[#374151]" />

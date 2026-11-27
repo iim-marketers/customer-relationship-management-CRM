@@ -9,7 +9,6 @@ import {
   UsersIcon,
 } from "lucide-react";
 
-/** Sidebar sections, in display order. */
 export const NAV_GROUPS = ["Overview", "Sales", "Insights"] as const;
 
 export function navItems(contactLabel: string) {

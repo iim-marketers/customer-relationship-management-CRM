@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RANGE_OPTIONS } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 
-/** Date-range picker bound to the `range` search param. */
 export function RangeSelect({ className }: { className?: string }) {
   const router = useRouter();
   const pathname = usePathname();

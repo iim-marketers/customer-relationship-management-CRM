@@ -67,7 +67,6 @@ type ShellProps = {
   user: { name: string; roleLabel: string };
   alerts: Promise<Alerts>;
   defaultOpen?: boolean;
-  /** Today's date, pre-formatted in the project timezone on the server. */
   today: string;
   children: React.ReactNode;
 };
@@ -250,7 +249,6 @@ function UserMenu({ user, slug }: { user: ShellProps["user"]; slug: string }) {
   );
 }
 
-/** Count pill shown next to a nav item; collapses to a dot in icon mode. */
 function NavCount({
   alerts,
   pick,
