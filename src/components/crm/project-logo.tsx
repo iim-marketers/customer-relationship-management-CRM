@@ -1,6 +1,6 @@
-import { cn, initials, readableOn } from "@/lib/utils";
+import { cn, initials } from "@/lib/utils";
 
-type P = { name: string; logo_url: string | null; brand_color: string | null };
+type P = { name: string; logo_url: string | null };
 
 export function ProjectLogo({ project, className }: { project: P; className?: string }) {
   if (project.logo_url) {
@@ -13,14 +13,12 @@ export function ProjectLogo({ project, className }: { project: P; className?: st
       />
     );
   }
-  const bg = project.brand_color ?? undefined;
   return (
     <span
       className={cn(
         "grid size-10 shrink-0 place-items-center rounded-xl bg-primary text-sm font-bold text-primary-foreground",
         className,
       )}
-      style={bg ? { background: bg, color: readableOn(bg) } : undefined}
     >
       {initials(project.name)}
     </span>

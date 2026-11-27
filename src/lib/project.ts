@@ -20,7 +20,7 @@ export const getProjectContext = cache(async (slug: string) => {
 
   const { data: project } = await supabase
     .from("projects")
-    .select("id, name, slug, industry, contact_label, brand_color, logo_url, timezone, created_at")
+    .select("id, name, slug, industry, contact_label, logo_url, timezone, created_at")
     .eq("slug", slug)
     .maybeSingle<Project>();
 

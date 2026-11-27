@@ -16,7 +16,6 @@ export type Project = {
   slug: string;
   industry: string | null;
   contact_label: string;
-  brand_color: string | null;
   logo_url: string | null;
   timezone: string;
   created_at: string;

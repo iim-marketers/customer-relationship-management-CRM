@@ -7,9 +7,8 @@ import { AuthCard, AuthShell } from "@/components/auth-card";
 import { ProjectLogo } from "@/components/crm/project-logo";
 import { LoginForm } from "@/components/login-form";
 import { Skeleton } from "@/components/ui/skeleton";
-import { readableOn } from "@/lib/utils";
 
-type Branding = { name: string; slug: string; logo_url: string | null; brand_color: string | null; industry: string | null };
+type Branding = { name: string; slug: string; logo_url: string | null; industry: string | null };
 
 async function getBranding(slug: string): Promise<Branding | null> {
   "use cache";
@@ -58,13 +57,9 @@ async function ProjectLogin({ params }: { params: Promise<{ slug: string }> }) {
     );
   }
 
-  const brandStyle = project.brand_color
-    ? ({ "--primary": project.brand_color, "--primary-foreground": readableOn(project.brand_color) } as React.CSSProperties)
-    : undefined;
-
   return (
     <AuthCard>
-      <div style={brandStyle}>
+      <div>
         <div className="mb-8 flex flex-col items-center text-center">
           <ProjectLogo project={project} className="mb-5 size-20 rounded-lg text-2xl" />
           <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>

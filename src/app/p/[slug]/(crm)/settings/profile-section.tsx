@@ -2,7 +2,7 @@
 
 import { TriangleAlertIcon } from "lucide-react";
 import { useState } from "react";
-import { Field, SelectField, TextField } from "@/components/crm/fields";
+import { SelectField, TextField } from "@/components/crm/fields";
 import { ProjectLogo } from "@/components/crm/project-logo";
 import { onSubmitForm, useAction } from "@/components/crm/use-action";
 import { SubmitButton } from "@/components/submit-button";
@@ -26,7 +26,6 @@ import { TIMEZONES } from "./master-config";
 
 export function ProfileSection({ project, isAdmin, isOwner }: { project: Project; isAdmin: boolean; isOwner: boolean }) {
   const { pending, run } = useAction();
-  const [brand, setBrand] = useState(project.brand_color ?? "");
   const [logo, setLogo] = useState(project.logo_url ?? "");
   const [name, setName] = useState(project.name);
   const loginPath = `/p/${project.slug}/login`;
@@ -35,7 +34,7 @@ export function ProfileSection({ project, isAdmin, isOwner }: { project: Project
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-4 rounded-xl border bg-muted/30 p-4">
-        <ProjectLogo project={{ name: name || project.name, logo_url: logo || null, brand_color: /^#[0-9a-f]{6}$/i.test(brand) ? brand : null }} className="size-14" />
+        <ProjectLogo project={{ name: name || project.name, logo_url: logo || null }} className="size-14" />
         <div className="min-w-0 flex-1">
           <div className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Team login page</div>
           <div className="truncate font-mono text-sm">{loginPath}</div>
@@ -62,23 +61,6 @@ export function ProfileSection({ project, isAdmin, isOwner }: { project: Project
             defaultValue={project.industry}
           />
           <SelectField label="Timezone" name="timezone" options={zones.map((z) => ({ value: z, label: z.replace("_", " ") }))} defaultValue={project.timezone} />
-          <Field label="Brand colour" htmlFor="brand_color">
-            <div className="flex items-center gap-2">
-              <input
-                type="color"
-                aria-label="Pick brand colour"
-                value={/^#[0-9a-f]{6}$/i.test(brand) ? brand : "#714b67"}
-                onChange={(e) => setBrand(e.target.value)}
-                className="h-9 w-12 shrink-0 cursor-pointer rounded-lg border bg-transparent p-1"
-              />
-              <Input id="brand_color" name="brand_color" value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="Default plum" className="font-mono" />
-              {brand && (
-                <Button type="button" variant="ghost" size="sm" onClick={() => setBrand("")}>
-                  Clear
-                </Button>
-              )}
-            </div>
-          </Field>
           <TextField label="Logo URL" name="logo_url" type="url" value={logo} onChange={(e) => setLogo(e.target.value)} placeholder="https://…/logo.png" />
           {isAdmin && (
             <SubmitButton pending={pending} className="sm:col-span-2 sm:justify-self-start">

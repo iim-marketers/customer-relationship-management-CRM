@@ -12,7 +12,7 @@ export function Wordmark({ className }: { className?: string }) {
       className={cn("text-[28px] leading-none font-semibold tracking-tight text-[#8f8f8f] dark:text-[#b4b4bb]", className)}
       aria-label="CRM home"
     >
-      <span className="text-[#714b67] dark:text-[#c79bbd]">C</span>RM
+      <span className="text-[#0f766e] dark:text-[#5eead4]">C</span>RM
     </Link>
   );
 }
@@ -64,12 +64,12 @@ export function SiteHeader() {
         <Wordmark />
         <div className="ml-auto flex items-center gap-2">
           <ThemeToggle />
-          <Link href="/login" className="rounded-md px-3 py-2 text-[15px] font-medium text-foreground hover:text-[#714b67] dark:hover:text-primary">
+          <Link href="/login" className="rounded-md px-3 py-2 text-[15px] font-medium text-foreground hover:text-[#0f766e] dark:hover:text-primary">
             Sign in
           </Link>
           <Link
             href="/signup"
-            className="rounded-md border border-[#5f3f57] bg-[#714b67] px-4 py-2 text-sm font-medium whitespace-nowrap text-white shadow-sm transition hover:bg-[#5f3f57]"
+            className="rounded-md border border-[#115e59] bg-[#0f766e] px-4 py-2 text-sm font-medium whitespace-nowrap text-white shadow-sm transition hover:bg-[#115e59]"
           >
             Get started
           </Link>

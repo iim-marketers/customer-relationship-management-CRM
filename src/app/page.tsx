@@ -1,14 +1,24 @@
 import {
+  ActivityIcon,
+  BarChart3Icon,
+  CalendarCheckIcon,
+  CalendarDaysIcon,
+  CalendarRangeIcon,
+  CalendarXIcon,
   ChevronDownIcon,
+  ChevronsUpDownIcon,
+  ClipboardListIcon,
   ClockIcon,
-  FilterIcon,
-  KanbanSquareIcon,
-  LayoutGridIcon,
-  ListIcon,
-  PlusIcon,
-  RefreshCwIcon,
+  LayoutDashboardIcon,
+  ListChecksIcon,
+  ListTodoIcon,
+  MoonIcon,
+  PanelLeftIcon,
+  PhoneCallIcon,
   SearchIcon,
-  XIcon,
+  SettingsIcon,
+  TrendingUpIcon,
+  UsersIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { FEATURES, featureTile } from "@/components/site/features";
@@ -40,25 +50,25 @@ export default function Home() {
           to capture leads, never miss a follow-up and turn enquiries into
           customers.
         </p>
-        <div className="mt-8 flex flex-wrap justify-center gap-4">
+        <div className="mt-6 flex flex-wrap justify-center gap-4">
           <Link
             href="/signup"
-            className="rounded-lg border border-[#5f3f57] bg-[#714b67] px-8 py-4 text-lg font-medium text-white shadow-md transition hover:-translate-y-px hover:bg-[#5f3f57]"
+            className="rounded-xl border border-[#115e59] bg-[#0f766e] px-6 py-3 text-lg font-medium text-white shadow-md transition hover:-translate-y-px hover:bg-[#115e59]"
           >
-            Start now
+            Get Started
           </Link>
           <Link
             href="/login"
-            className="rounded-lg bg-[#f1f2f4] px-8 py-4 text-lg font-medium text-[#714b67] transition hover:bg-[#e7e9ed] dark:bg-secondary dark:text-foreground"
+            className="rounded-lg bg-[#f1f2f4] px-6 py-3 text-lg font-medium text-[#0f766e] transition hover:bg-[#e7e9ed] dark:bg-secondary dark:text-foreground"
           >
-            Sign in to your CRM
+            Sign in
           </Link>
         </div>
         <p className="mt-5 text-[15px]">
           Ready in under a minute, with a branded login page for each project.{" "}
           <ScrollLink
             href="#features"
-            className="font-medium text-[#714b67] hover:underline dark:text-primary"
+            className="font-medium text-[#0f766e] hover:underline dark:text-primary"
           >
             See why
           </ScrollLink>
@@ -71,7 +81,7 @@ export default function Home() {
           className="absolute inset-x-[-30%] top-24 bottom-0 rounded-t-[50%] bg-[#f1f2f4] dark:bg-muted"
         />
         <div className="relative mx-auto max-w-5xl px-4 sm:px-6">
-          <PipelineMockup />
+          <DashboardMockup />
         </div>
       </section>
 
@@ -85,7 +95,7 @@ export default function Home() {
             <span
               className={cn(
                 script.className,
-                "relative inline-block text-[1.25em] font-normal text-[#714b67] dark:text-primary",
+                "relative inline-block text-[1.25em] font-normal text-[#0f766e] dark:text-primary",
               )}
             >
               nothing it doesn&apos;t
@@ -114,7 +124,7 @@ export default function Home() {
               <div
                 key={f.id}
                 id={f.id}
-                className="flex scroll-mt-28 flex-col items-center rounded-xl p-2 text-center target:bg-white target:shadow-md target:ring-1 target:ring-[#714b67]/20 dark:target:bg-card"
+                className="flex scroll-mt-28 flex-col items-center rounded-xl p-2 text-center target:bg-white target:shadow-md target:ring-1 target:ring-[#0f766e]/20 dark:target:bg-card"
               >
                 <span
                   className="grid size-16 place-items-center rounded-2xl text-white shadow-md"
@@ -144,7 +154,7 @@ export default function Home() {
         <div className="mt-8 flex flex-wrap justify-center gap-4">
           <Link
             href="/signup"
-            className="rounded-lg border border-[#5f3f57] bg-[#714b67] px-8 py-4 text-lg font-medium text-white shadow-md transition hover:-translate-y-px hover:bg-[#5f3f57]"
+            className="rounded-lg border border-[#115e59] bg-[#0f766e] px-8 py-4 text-lg font-medium text-white shadow-md transition hover:-translate-y-px hover:bg-[#115e59]"
           >
             Create your first project
           </Link>
@@ -167,217 +177,261 @@ export default function Home() {
   );
 }
 
+const TEAL = "#0f766e";
 
-type FollowUp = "overdue" | "today" | "planned" | "none";
-type SampleLead = {
-  name: string;
-  service: string;
-  phone: string;
-  source: string;
-  repeat?: number;
-  followUp: FollowUp;
-  branch: string;
-  owner: keyof typeof OWNERS;
-};
+const MOCK_NAV = [
+  { group: "Overview", items: [{ label: "Dashboard", icon: LayoutDashboardIcon, active: true }, { label: "To-Do", icon: ListTodoIcon, count: 4 }] },
+  {
+    group: "Sales",
+    items: [
+      { label: "Leads", icon: ClipboardListIcon },
+      { label: "Appointments", icon: CalendarCheckIcon, count: 3 },
+      { label: "Patients", icon: UsersIcon },
+      { label: "Call Logs", icon: PhoneCallIcon },
+    ],
+  },
+  { group: "Insights", items: [{ label: "Reports", icon: BarChart3Icon }, { label: "Settings", icon: SettingsIcon }] },
+] as const;
 
-const FOLLOW_UP: Record<FollowUp, { bar: string; icon: string }> = {
-  planned: { bar: "bg-[#28a745]", icon: "text-[#28a745]" },
-  today: { bar: "bg-[#ea580c]", icon: "text-[#ea580c]" },
-  overdue: { bar: "bg-[#d44c59]", icon: "text-[#d44c59]" },
-  none: { bar: "bg-[#6b7280]/25", icon: "text-[#6b7280]/60" },
-};
-
-const SOURCE_COLOR: Record<string, string> = {
-  Website: "#d6145f",
-  "Meta Ads": "#9365b8",
-  Instagram: "#f06050",
-  "Google Ads": "#5b6dd1",
-  WhatsApp: "#30c381",
-  Referral: "#2c8397",
-  "Walk-in": "#475577",
-  "Inbound Call": "#6cc1ed",
-};
-const OWNERS = { AK: "#9365b8", SN: "#2c8397", RV: "#eb7e7f", MJ: "#475577" } as const;
-
-const STAGES: { name: string; count: number; bar: [number, number, number, number]; leads: SampleLead[] }[] = [
-  {
-    name: "New Lead",
-    count: 14,
-    bar: [5, 3, 2, 4],
-    leads: [
-      { name: "Priya Sharma", service: "General Consultation", phone: "+91 98201 44512", source: "Website", followUp: "planned", branch: "City Centre", owner: "AK" },
-      { name: "Rahul Mehta", service: "Full Body Therapy", phone: "+91 99870 21455", source: "Meta Ads", repeat: 2, followUp: "today", branch: "Main Branch", owner: "SN" },
-      { name: "Kavya Reddy", service: "Premium Package", phone: "+91 90080 67321", source: "Instagram", followUp: "none", branch: "Lakeside", owner: "RV" },
-    ],
-  },
-  {
-    name: "Follow-up",
-    count: 9,
-    bar: [3, 2, 4, 0],
-    leads: [
-      { name: "Neha Kapoor", service: "Follow-up Visit", phone: "+91 98450 11873", source: "Google Ads", followUp: "overdue", branch: "Main Branch", owner: "RV" },
-      { name: "Vikram Rao", service: "General Consultation", phone: "+91 97411 50926", source: "WhatsApp", followUp: "planned", branch: "City Centre", owner: "AK" },
-      { name: "Ananya Iyer", service: "Full Body Therapy", phone: "+91 96860 33410", source: "Referral", followUp: "today", branch: "Lakeside", owner: "MJ" },
-    ],
-  },
-  {
-    name: "Contacted",
-    count: 7,
-    bar: [3, 1, 2, 1],
-    leads: [
-      { name: "Karan Singh", service: "Premium Package", phone: "+91 98863 72045", source: "Inbound Call", followUp: "overdue", branch: "City Centre", owner: "SN" },
-      { name: "Isha Patel", service: "General Consultation", phone: "+91 99011 48266", source: "Walk-in", repeat: 3, followUp: "planned", branch: "Main Branch", owner: "MJ" },
-    ],
-  },
-  {
-    name: "Appointment Booked",
-    count: 5,
-    bar: [4, 1, 0, 0],
-    leads: [
-      { name: "Meera Joshi", service: "Follow-up Visit", phone: "+91 97399 20584", source: "Google Ads", followUp: "planned", branch: "Lakeside", owner: "AK" },
-      { name: "Arjun Das", service: "Full Body Therapy", phone: "+91 98804 66132", source: "Website", followUp: "today", branch: "City Centre", owner: "RV" },
-    ],
-  },
-  {
-    name: "No Show",
-    count: 3,
-    bar: [0, 1, 2, 0],
-    leads: [
-      { name: "Sneha Kulkarni", service: "General Consultation", phone: "+91 96635 18890", source: "Meta Ads", followUp: "overdue", branch: "Main Branch", owner: "SN" },
-    ],
-  },
+const MOCK_STATS = [
+  { label: "Total leads", value: "38", hint: "12 with repeat enquiries", icon: ClipboardListIcon, chip: "bg-[#f3f4f6] text-[#6b7280]" },
+  { label: "Booked appointments", value: "11", hint: "Scheduled or confirmed", icon: CalendarCheckIcon, chip: "bg-[#017e84]/12 text-[#017e84]" },
+  { label: "No-show appointments", value: "3", hint: "Needs recovery follow-up", icon: CalendarXIcon, chip: "bg-[#ea580c]/12 text-[#ea580c]" },
+  { label: "Patient conversion", value: "24%", hint: "9 converted leads", icon: TrendingUpIcon, chip: "bg-[#28a745]/12 text-[#28a745]" },
 ];
 
-const NAV = ["Dashboard", "To-Do", "Leads", "Appointments", "Patients", "Call Logs", "Reports", "Settings"];
+const MOCK_STAGES = [
+  { name: "New Lead", color: "#0ea5e9", count: 6 },
+  { name: "Follow-up", color: "#6b8afd", count: 8 },
+  { name: "Contacted", color: "#f97316", count: 6 },
+  { name: "Appointment Booked", color: "#14b8a6", count: 5 },
+  { name: "No Show", color: "#ef4444", count: 3 },
+  { name: "Lost", color: "#78716c", count: 1 },
+  { name: "Converted", color: "#22c55e", count: 9 },
+];
 
-function PipelineMockup() {
-  const total = STAGES.reduce((n, s) => n + s.count, 0);
+const MOCK_FOLLOW_UPS = [
+  { name: "Neha Kapoor", detail: "Google Ads / Follow-up Visit", when: "26 Nov, 10:00 · overdue", overdue: true, stage: 1 },
+  { name: "Karan Singh", detail: "Inbound Call / Premium Package", when: "26 Nov, 16:30", overdue: false, stage: 2 },
+  { name: "Vikram Rao", detail: "WhatsApp / General Consultation", when: "27 Nov, 11:15", overdue: false, stage: 0 },
+];
+
+const MOCK_APPOINTMENTS = [
+  { day: "26 Nov", time: "14:30", name: "Meera Joshi", where: "Lakeside", status: "Confirmed", tone: "#28a745" },
+  { day: "27 Nov", time: "10:00", name: "Arjun Das", where: "City Centre", status: "Scheduled", tone: "#017e84" },
+  { day: "27 Nov", time: "17:45", name: "Isha Patel", where: "Main Branch", status: "Rescheduled", tone: "#ea580c" },
+];
+
+function MockPanel({ title, icon: Icon, action, children }: { title: string; icon: typeof ClockIcon; action?: string; children: React.ReactNode }) {
+  return (
+    <div className="overflow-hidden rounded-lg border border-[#dee2e6] bg-white">
+      <div className="flex items-center justify-between border-b border-[#dee2e6] px-3.5 py-2">
+        <span className="flex items-center gap-1.5 text-[12px] font-semibold">
+          <Icon className="size-3.5" style={{ color: TEAL }} />
+          {title}
+        </span>
+        {action && (
+          <span className="text-[11px] font-medium" style={{ color: TEAL }}>
+            {action}
+          </span>
+        )}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function StageDot({ color }: { color: string }) {
+  return <span className="size-1.5 shrink-0 rounded-full" style={{ background: color }} />;
+}
+
+function StagePill({ stage }: { stage: (typeof MOCK_STAGES)[number] }) {
+  return (
+    <span
+      className="shrink-0 rounded-full px-1.5 py-px text-[9.5px] font-medium"
+      style={{ color: stage.color, backgroundColor: `color-mix(in oklch, ${stage.color} 14%, white)` }}
+    >
+      {stage.name}
+    </span>
+  );
+}
+
+function DashboardMockup() {
+  const total = MOCK_STAGES.reduce((n, s) => n + s.count, 0);
   return (
     <div
       aria-hidden
-      className="pointer-events-none overflow-hidden rounded-xl border border-black/5 bg-[#f9fafb] text-[#1f2937] shadow-[0_30px_80px_-20px_rgba(17,24,39,0.35)] select-none"
+      className="pointer-events-none flex overflow-hidden rounded-xl border border-black/5 bg-[#f9fafb] text-left text-[#1f2937] shadow-[0_30px_80px_-20px_rgba(17,24,39,0.35)] select-none"
     >
-      <div className="flex h-11 items-center gap-1 border-b border-[#dee2e6] bg-white px-2.5 text-[12px] text-[#374151]">
-        <span className="grid size-7 place-items-center">
-          <LayoutGridIcon className="size-3.5" />
-        </span>
-        <span className="flex items-center gap-1.5 px-1.5">
-          <span className="grid size-5 place-items-center rounded-md bg-[#714b67] text-[8px] font-bold text-white">SC</span>
-          <span className="text-[13px] font-semibold text-[#1f2937]">Sunrise Clinic</span>
-        </span>
-        <span className="hidden items-center md:flex">
-          {NAV.map((n) => (
-            <span key={n} className={cn("rounded-md px-2 py-1 whitespace-nowrap", n === "Leads" && "bg-[#f3f4f6] font-medium text-[#1f2937]")}>
-              {n}
-            </span>
-          ))}
-        </span>
-        <span className="ml-auto flex items-center gap-1">
-          <span className="grid size-7 place-items-center">
-            <SearchIcon className="size-3.5" />
+      <div className="hidden w-[184px] shrink-0 flex-col border-r border-[#dee2e6] bg-white md:flex">
+        <div className="flex h-11 items-center gap-2 border-b border-[#dee2e6] px-3">
+          <span className="grid size-6 place-items-center rounded-md text-[9px] font-bold text-white" style={{ background: TEAL }}>
+            SC
           </span>
-          <span className="relative grid size-7 place-items-center">
-            <ClockIcon className="size-3.5" />
-            <span className="absolute top-0 right-0 grid h-3.5 min-w-3.5 place-items-center rounded-full bg-[#d44c59] px-0.5 text-[8px] font-bold text-white">
-              4
-            </span>
+          <span className="leading-tight">
+            <span className="block text-[12px] font-semibold">Sunrise Clinic</span>
+            <span className="block text-[9.5px] text-[#6b7280]">CRM workspace</span>
           </span>
-          <span className="ml-1 grid size-6 place-items-center rounded-md bg-[#714b67] text-[9px] font-bold text-white">AK</span>
-        </span>
-      </div>
-
-      <div className="flex items-center gap-3 border-b border-[#dee2e6] bg-white px-4 py-2 text-[12px]">
-        <span className="rounded-md bg-[#714b67] px-2.5 py-1 font-medium text-white">New</span>
-        <span className="leading-tight">
-          <span className="block text-[14px] font-semibold">Pipeline</span>
-          <span className="block text-[10px] text-[#6b7280]">{total} last 30 days · leads</span>
-        </span>
-        <span className="mx-auto hidden w-[22rem] items-stretch rounded-md border border-[#dee2e6] sm:flex">
-          <span className="flex flex-1 items-center gap-1.5 py-1 pl-2">
-            <SearchIcon className="size-3 text-[#6b7280]" />
-            <span className="flex items-center overflow-hidden rounded-sm bg-[#f3f4f6] text-[10px]">
-              <span className="grid self-stretch place-items-center bg-[#714b67] px-1 text-white">
-                <FilterIcon className="size-2.5" />
-              </span>
-              <span className="px-1.5 py-0.5">
-                <span className="text-[#6b7280]">Date range:</span> Last 30 days
-              </span>
-              <XIcon className="mr-1 size-2.5 text-[#6b7280]" />
-            </span>
-            <span className="text-[#9ca3af]">Search…</span>
+        </div>
+        <div className="flex flex-1 flex-col gap-2 p-2">
+          <span className="flex h-7 items-center gap-1.5 rounded-md border border-[#dee2e6] px-2 text-[11px] text-[#6b7280]">
+            <SearchIcon className="size-3" /> Search…
           </span>
-          <span className="flex items-center border-l border-[#dee2e6] px-1.5 text-[#6b7280]">
-            <ChevronDownIcon className="size-3" />
-          </span>
-        </span>
-        <span className="ml-auto flex items-center gap-2 sm:ml-0">
-          <RefreshCwIcon className="size-3.5 text-[#374151]" />
-          <span className="flex overflow-hidden rounded-md border border-[#dee2e6]">
-            <span className="grid h-6 w-7 place-items-center bg-[#e7e9ed]">
-              <KanbanSquareIcon className="size-3" />
-            </span>
-            <span className="grid h-6 w-7 place-items-center border-l border-[#dee2e6] text-[#6b7280]">
-              <ListIcon className="size-3" />
-            </span>
-          </span>
-        </span>
-      </div>
-
-      <div className="flex gap-3 px-4 pt-3 pb-5">
-        {STAGES.map((stage) => {
-          const sum = stage.bar.reduce((a, b) => a + b, 0) || 1;
-          return (
-            <div key={stage.name} className="w-[220px] shrink-0">
-              <div className="flex items-center justify-between px-0.5">
-                <span className="truncate text-[13px] font-semibold">{stage.name}</span>
-                <PlusIcon className="size-3.5 text-[#6b7280]" />
-              </div>
-              <div className="mt-1.5 flex items-center gap-2 px-0.5">
-                <div className="flex h-1.5 flex-1 overflow-hidden rounded-full bg-[#f3f4f6]">
-                  {(["planned", "today", "overdue", "none"] as const).map((k, i) => (
-                    <span key={k} className={cn("h-full", FOLLOW_UP[k].bar)} style={{ width: `${(stage.bar[i] / sum) * 100}%` }} />
-                  ))}
-                </div>
-                <span className="text-[12px] font-semibold text-[#6b7280] tabular-nums">{stage.count}</span>
-              </div>
-              <div className="mt-2.5 flex flex-col gap-2">
-                {stage.leads.map((l) => {
-                  const tag = SOURCE_COLOR[l.source];
-                  return (
-                    <div key={l.name} className="rounded-md border border-[#dee2e6] bg-white p-2 text-[11px] shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
-                      <div className="truncate text-[12px] font-semibold">{l.name}</div>
-                      <div className="truncate text-[#1f2937]/80">{l.service}</div>
-                      <div className="truncate text-[#6b7280]">{l.phone}</div>
-                      <div className="mt-1.5 flex flex-wrap gap-1">
-                        <span
-                          className="rounded-full px-1.5 py-px text-[9.5px] font-medium"
-                          style={{ color: tag, backgroundColor: `color-mix(in oklch, ${tag} 15%, white)` }}
-                        >
-                          {l.source}
-                        </span>
-                        {l.repeat && (
-                          <span className="rounded-full bg-[#ea580c]/15 px-1.5 py-px text-[9.5px] font-medium text-[#c2410c]">
-                            Repeat ×{l.repeat}
-                          </span>
+          {MOCK_NAV.map((section) => (
+            <div key={section.group}>
+              <div className="px-2 pt-1 pb-1 text-[9px] font-semibold tracking-wider text-[#374151]/45 uppercase">{section.group}</div>
+              {section.items.map((item) => {
+                const active = "active" in item && item.active;
+                return (
+                  <span
+                    key={item.label}
+                    className={cn("flex h-7 items-center gap-2 rounded-md px-2 text-[11.5px]", active ? "font-medium" : "text-[#374151]/80")}
+                    style={active ? { background: `${TEAL}1a`, color: TEAL } : undefined}
+                  >
+                    <item.icon className="size-3.5" style={{ color: active ? TEAL : "rgba(55,65,81,0.55)" }} />
+                    {item.label}
+                    {"count" in item && (
+                      <span
+                        className={cn(
+                          "ml-auto rounded-full px-1.5 text-[9px] leading-4 font-semibold",
+                          item.label === "To-Do" ? "bg-[#d44c59]/12 text-[#d44c59]" : "",
                         )}
-                      </div>
-                      <div className="mt-1.5 flex items-center gap-1.5 text-[10px] text-[#6b7280]">
-                        <ClockIcon className={cn("size-3.5", FOLLOW_UP[l.followUp].icon)} />
-                        <span className="truncate">{l.branch}</span>
-                        <span
-                          className="ml-auto grid size-5 shrink-0 place-items-center rounded-full text-[8px] font-bold text-white"
-                          style={{ background: OWNERS[l.owner] }}
-                        >
-                          {l.owner}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
+                        style={item.label === "To-Do" ? undefined : { background: `${TEAL}1f`, color: TEAL }}
+                      >
+                        {item.count}
+                      </span>
+                    )}
+                  </span>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center gap-2 border-t border-[#dee2e6] p-2.5">
+          <span className="grid size-6 place-items-center rounded-full text-[9px] font-semibold" style={{ background: `${TEAL}1f`, color: TEAL }}>
+            AK
+          </span>
+          <span className="leading-tight">
+            <span className="block text-[11px] font-medium">Aditi Kumar</span>
+            <span className="block text-[9.5px] text-[#6b7280]">Owner</span>
+          </span>
+          <ChevronsUpDownIcon className="ml-auto size-3 text-[#6b7280]" />
+        </div>
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <div className="flex h-11 items-center gap-2 border-b border-[#dee2e6] bg-white px-3 text-[12px]">
+          <PanelLeftIcon className="size-3.5 text-[#374151]" />
+          <span className="h-3.5 w-px bg-[#dee2e6]" />
+          <span className="font-semibold">Sunrise Clinic</span>
+          <span className="text-[#6b7280]">/</span>
+          <span className="font-medium">Dashboard</span>
+          <span className="ml-auto flex items-center gap-2.5 text-[#374151]">
+            <span className="hidden items-center gap-1 rounded-md border border-[#dee2e6] bg-[#f3f4f6]/60 px-2 py-0.5 text-[10px] font-medium text-[#6b7280] sm:flex">
+              <CalendarDaysIcon className="size-3" /> Thu, 26 Nov
+            </span>
+            <MoonIcon className="size-3.5" />
+            <span className="relative">
+              <ClockIcon className="size-3.5" />
+              <span className="absolute -top-1.5 -right-1.5 grid h-3 min-w-3 place-items-center rounded-full bg-[#d44c59] px-0.5 text-[7px] font-bold text-white">
+                4
+              </span>
+            </span>
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between border-b border-[#dee2e6] bg-white px-4 py-2">
+          <span className="leading-tight">
+            <span className="block text-[14px] font-semibold">Dashboard</span>
+            <span className="block text-[10px] text-[#6b7280]">Last 30 days · Sunrise Clinic</span>
+          </span>
+          <span className="flex h-7 items-center gap-1.5 rounded-md border border-[#dee2e6] bg-white px-2 text-[11px]">
+            <CalendarRangeIcon className="size-3 text-[#6b7280]" /> Last 30 days
+            <ChevronDownIcon className="size-3 text-[#6b7280]" />
+          </span>
+        </div>
+
+        <div className="flex flex-col gap-3 p-4">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            {MOCK_STATS.map((s) => (
+              <div key={s.label} className="rounded-lg border border-[#dee2e6] bg-white p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="text-[10.5px] font-medium text-[#6b7280]">{s.label}</span>
+                  <span className={cn("grid size-6 place-items-center rounded-md", s.chip)}>
+                    <s.icon className="size-3.5" />
+                  </span>
+                </div>
+                <div className="mt-1 text-[22px] font-semibold tracking-tight tabular-nums">{s.value}</div>
+                <div className="truncate text-[10px] text-[#6b7280]">{s.hint}</div>
+              </div>
+            ))}
+          </div>
+
+          <MockPanel title="Lead Pipeline" icon={ActivityIcon} action="Open pipeline">
+            <div className="flex flex-col gap-2.5 p-3">
+              <div className="flex h-1.5 overflow-hidden rounded-full bg-[#f3f4f6]">
+                {MOCK_STAGES.map((st) => (
+                  <span key={st.name} style={{ width: `${(st.count / total) * 100}%`, background: st.color }} />
+                ))}
+              </div>
+              <div className="grid grid-cols-4 gap-2 lg:grid-cols-7">
+                {MOCK_STAGES.map((st, i) => (
+                  <div key={st.name} className={cn("rounded-md border border-[#dee2e6] bg-[#f9fafb]/60 px-2 py-1.5", i > 3 && "hidden lg:block")}>
+                    <span className="flex items-center gap-1 text-[9.5px] text-[#6b7280]">
+                      <StageDot color={st.color} />
+                      <span className="truncate">{st.name}</span>
+                    </span>
+                    <span className="mt-0.5 flex items-baseline justify-between">
+                      <span className="text-[15px] font-semibold tabular-nums">{st.count}</span>
+                      <span className="text-[9px] text-[#6b7280] tabular-nums">{Math.round((st.count / total) * 100)}%</span>
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
-          );
-        })}
+          </MockPanel>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <MockPanel title="Follow-up Queue" icon={ListChecksIcon} action="Open To-Do">
+              <ul className="divide-y divide-[#dee2e6] px-1">
+                {MOCK_FOLLOW_UPS.map((f) => (
+                  <li key={f.name} className="flex items-center gap-2 px-2.5 py-2">
+                    <span className="size-1.5 shrink-0 rounded-full" style={{ background: f.overdue ? "#d44c59" : TEAL }} />
+                    <span className="min-w-0 flex-1 leading-tight">
+                      <span className="block truncate text-[11.5px] font-medium">{f.name}</span>
+                      <span className="block truncate text-[10px] text-[#6b7280]">{f.detail}</span>
+                      <span className={cn("block text-[9.5px]", f.overdue ? "text-[#d44c59]" : "text-[#6b7280]")}>{f.when}</span>
+                    </span>
+                    <StagePill stage={MOCK_STAGES[f.stage]} />
+                  </li>
+                ))}
+              </ul>
+            </MockPanel>
+
+            <MockPanel title="Upcoming Appointments" icon={CalendarCheckIcon} action="Calendar">
+              <ul className="divide-y divide-[#dee2e6] px-1">
+                {MOCK_APPOINTMENTS.map((a) => (
+                  <li key={a.name} className="flex items-center gap-2.5 px-2.5 py-2">
+                    <span className="w-11 shrink-0 rounded-md bg-[#f3f4f6] py-0.5 text-center leading-tight">
+                      <span className="block text-[8.5px] text-[#6b7280] uppercase">{a.day}</span>
+                      <span className="block text-[11px] font-semibold tabular-nums">{a.time}</span>
+                    </span>
+                    <span className="min-w-0 flex-1 leading-tight">
+                      <span className="block truncate text-[11.5px] font-medium">{a.name}</span>
+                      <span className="block truncate text-[10px] text-[#6b7280]">{a.where}</span>
+                    </span>
+                    <span
+                      className="shrink-0 rounded-full px-1.5 py-px text-[9.5px] font-medium"
+                      style={{ color: a.tone, backgroundColor: `color-mix(in oklch, ${a.tone} 14%, white)` }}
+                    >
+                      {a.status}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </MockPanel>
+          </div>
+        </div>
       </div>
     </div>
   );

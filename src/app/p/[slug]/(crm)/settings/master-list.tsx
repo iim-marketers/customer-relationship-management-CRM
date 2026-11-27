@@ -73,7 +73,7 @@ function RecordDialog({
                     id={`m-${f.name}`}
                     name={f.name}
                     type="color"
-                    defaultValue={(value as string) ?? "#714b67"}
+                    defaultValue={(value as string) ?? "#0f766e"}
                     className="h-9 w-20 cursor-pointer rounded-lg border bg-transparent p-1"
                   />
                 </Field>
@@ -182,7 +182,7 @@ export function MasterList({ slug, table, rows, isAdmin }: { slug: string; table
                   {columns.map((c) => (
                     <TableCell key={c.name} className={c.name === "name" ? "font-medium" : "text-muted-foreground"}>
                       {isStages && c.name === "name" ? (
-                        <ColorBadge color={String(row.color ?? "#714b67")}>{String(row.name)}</ColorBadge>
+                        <ColorBadge color={String(row.color ?? "#0f766e")}>{String(row.name)}</ColorBadge>
                       ) : c.type === "select" ? (
                         (c.options?.find((o) => o.value === row[c.name])?.label ?? String(row[c.name] ?? "—"))
                       ) : (
