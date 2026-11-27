@@ -131,9 +131,8 @@ export async function signIn(_: AuthState, formData: FormData): Promise<AuthStat
   return enterApp(supabase, data.user.id, projectSlug, safeNext(formData.get("next")));
 }
 
-export async function signOut(formData?: FormData) {
+export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  const slug = formData?.get("project");
-  redirect(typeof slug === "string" && slug ? `/p/${slug}/login` : "/login");
+  redirect("/");
 }

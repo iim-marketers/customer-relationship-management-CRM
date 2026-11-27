@@ -1,5 +1,13 @@
 import { cn } from "@/lib/utils";
 
+const TONES = {
+  primary: "bg-primary/10 text-primary",
+  success: "bg-success/12 text-success",
+  warning: "bg-warning/12 text-warning",
+  info: "bg-info/12 text-info",
+  muted: "bg-muted text-muted-foreground",
+} as const;
+
 export function StatCard({
   label,
   value,
@@ -11,30 +19,24 @@ export function StatCard({
   value: React.ReactNode;
   hint?: string;
   icon?: React.ComponentType<{ className?: string }>;
-  tone?: "success" | "warning" | "info" | "muted";
+  tone?: keyof typeof TONES;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-lg border bg-card p-4 shadow-xs">
-      <div className="text-sm font-medium text-muted-foreground">{label}</div>
-      <div className="mt-1 text-3xl font-semibold tracking-tight text-primary tabular-nums">{value}</div>
+    <div className="flex flex-col gap-3 rounded-xl border bg-card p-5 shadow-xs">
+      <div className="flex items-start justify-between gap-3">
+        <div className="text-sm font-medium text-muted-foreground">{label}</div>
+        {Icon ? (
+          <span className={cn("grid size-9 shrink-0 place-items-center rounded-lg", TONES[tone])}>
+            <Icon className="size-4.5" />
+          </span>
+        ) : null}
+      </div>
+      <div className="text-3xl font-semibold tracking-tight tabular-nums">{value}</div>
       {hint && (
-        <div
-          className={cn(
-            "mt-1 truncate text-sm font-medium",
-            tone === "success" && "text-success",
-            tone === "warning" && "text-warning",
-            tone === "info" && "text-info",
-            tone === "muted" && "text-muted-foreground",
-          )}
-        >
+        <div className="truncate text-sm text-muted-foreground" title={hint}>
           {hint}
         </div>
       )}
-      {Icon ? (
-        <span className="absolute top-4 right-4 grid size-9 place-items-center rounded-md bg-primary/10 text-primary">
-          <Icon className="size-4.5" />
-        </span>
-      ) : null}
     </div>
   );
 }

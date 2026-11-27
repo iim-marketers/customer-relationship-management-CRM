@@ -34,9 +34,6 @@ export async function updateProjectProfile(slug: string, formData: FormData) {
     const name = str(formData.get("name"));
     if (!name || name.length < 2) return { ok: false, error: "Project name must be at least 2 characters" };
 
-    const brand = str(formData.get("brand_color"));
-    if (brand && !/^#[0-9a-fA-F]{6}$/.test(brand)) return { ok: false, error: "Brand colour must be a hex value like #714b67" };
-
     const timezone = str(formData.get("timezone")) ?? ctx.project.timezone;
     try {
       new Intl.DateTimeFormat("en-US", { timeZone: timezone });
@@ -53,7 +50,6 @@ export async function updateProjectProfile(slug: string, formData: FormData) {
         name,
         contact_label: str(formData.get("contact_label")) ?? "Customers",
         industry: idOrNull(formData.get("industry")),
-        brand_color: brand,
         logo_url: logo,
         timezone,
       })
@@ -248,7 +244,7 @@ export async function saveMasterRecord(slug: string, table: MasterTable, id: str
     const values = masterValues(table, formData);
     if (!values.name) return { ok: false, error: "Name is required" };
     if (table === "lead_stages" && values.color && !/^#[0-9a-fA-F]{6}$/.test(String(values.color))) {
-      return { ok: false, error: "Colour must be a hex value like #714b67" };
+      return { ok: false, error: "Colour must be a hex value like #0f766e" };
     }
 
     if (id) {
