@@ -12,10 +12,10 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { Suspense, use, useRef } from "react";
-import { signOut } from "@/app/(auth)/actions";
+import { Suspense, use, useState } from "react";
 import { ProjectLogo } from "@/components/crm/project-logo";
 import { NAV_GROUPS, navItems } from "@/components/crm/nav";
+import { SignOutButton, SignOutDialog } from "@/components/crm/sign-out-dialog";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -188,7 +188,7 @@ function ActivityMenuContent({
 function UserMenu({ user, slug }: { user: ShellProps["user"]; slug: string }) {
   const { resolvedTheme, setTheme } = useTheme();
   const { isMobile } = useSidebar();
-  const formRef = useRef<HTMLFormElement>(null);
+  const [signOutOpen, setSignOutOpen] = useState(false);
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -238,12 +238,12 @@ function UserMenu({ user, slug }: { user: ShellProps["user"]; slug: string }) {
               {resolvedTheme === "dark" ? "Light mode" : "Dark mode"}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={() => formRef.current?.requestSubmit()}>
+            <DropdownMenuItem onSelect={() => setSignOutOpen(true)}>
               <LogOutIcon /> Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
-          <form ref={formRef} action={signOut} className="hidden" />
         </DropdownMenu>
+        <SignOutDialog open={signOutOpen} onOpenChange={setSignOutOpen} />
       </SidebarMenuItem>
     </SidebarMenu>
   );
@@ -377,7 +377,7 @@ function AppSidebar({
                 variant="outline"
                 tooltip="Search"
                 isActive={isActive("search")}
-                className="h-9 gap-2 bg-sidebar px-2.5 text-muted-foreground shadow-none data-active:text-primary"
+                className="h-9 gap-2 border border-sidebar-border bg-sidebar px-2.5 text-muted-foreground shadow-none data-active:border-primary/40 data-active:text-primary"
               >
                 <Link href={`${base}/search`} onClick={closeOnMobile}>
                   <SearchIcon />
@@ -478,6 +478,7 @@ export function AppShell({
             </span>
             <ThemeToggle variant="ghost" />
             <ActivityMenu base={base} alerts={alerts} />
+            <SignOutButton />
           </div>
         </header>
 

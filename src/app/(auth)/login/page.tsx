@@ -12,7 +12,7 @@ export default function LoginPage() {
     <AuthShell>
       <AuthCard>
         <div className="mb-8 flex flex-col items-center text-center">
-          <BrandMark className="mb-6 text-lg" />
+          <BrandMark className="mb-6 text-2xl" />
           <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
           <p className="mt-2 text-muted-foreground">Sign in to continue to your CRM dashboard.</p>
         </div>
