@@ -2,17 +2,14 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 
 export function Wordmark({ className }: { className?: string }) {
   return (
-    <Link
-      href="/"
-      className={cn("text-[28px] leading-none font-semibold tracking-tight text-[#8f8f8f] dark:text-[#b4b4bb]", className)}
-      aria-label="CRM home"
-    >
-      <span className="text-[#0f766e] dark:text-[#5eead4]">C</span>RM
+    <Link href="/" aria-label="CRM home" className={cn("flex text-[24px]", className)}>
+      <Logo />
     </Link>
   );
 }

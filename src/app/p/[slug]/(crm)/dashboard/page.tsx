@@ -187,12 +187,23 @@ async function Dashboard({ params, searchParams }: Props) {
             "Open pipeline",
           )}
         >
-          {/* <div className="flex h-2 w-full overflow-hidden rounded-full bg-muted" aria-hidden>
+          <div
+            className="flex h-2 w-full overflow-hidden rounded-full bg-muted"
+            aria-hidden
+          >
             {stageTotal > 0 &&
               s.stages.map((st) =>
-                st.count > 0 ? <span key={st.id} style={{ width: `${(st.count / stageTotal) * 100}%`, background: st.color }} /> : null,
+                st.count > 0 ? (
+                  <span
+                    key={st.id}
+                    style={{
+                      width: `${(st.count / stageTotal) * 100}%`,
+                      background: st.color,
+                    }}
+                  />
+                ) : null,
               )}
-          </div> */}
+          </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-7">
             {s.stages.map((st) => (
               <Link
@@ -360,7 +371,9 @@ async function Dashboard({ params, searchParams }: Props) {
                       <div className="min-w-0 flex-1 space-y-0.5">
                         <div className="truncate font-medium">{l.name}</div>
                         <div className="truncate text-sm text-muted-foreground">
-                          {sourceName(l.source_id)} · {l.phone ?? "no phone"} ·{" "}
+                          {sourceName(l.source_id)} · {l.phone ?? "no phone"}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
                           {fmt.dateTime(l.created_at, tz)}
                         </div>
                       </div>

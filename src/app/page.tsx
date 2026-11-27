@@ -12,11 +12,14 @@ import {
   LayoutDashboardIcon,
   ListChecksIcon,
   ListTodoIcon,
+  LogOutIcon,
   MoonIcon,
   PanelLeftIcon,
   PhoneCallIcon,
+  RefreshCwIcon,
   SearchIcon,
   SettingsIcon,
+  SparklesIcon,
   TrendingUpIcon,
   UsersIcon,
 } from "lucide-react";
@@ -217,14 +220,49 @@ const MOCK_FOLLOW_UPS = [
 ];
 
 const MOCK_APPOINTMENTS = [
-  { day: "26 Nov", time: "14:30", name: "Meera Joshi", where: "Lakeside", status: "Confirmed", tone: "#28a745" },
-  { day: "27 Nov", time: "10:00", name: "Arjun Das", where: "City Centre", status: "Scheduled", tone: "#017e84" },
-  { day: "27 Nov", time: "17:45", name: "Isha Patel", where: "Main Branch", status: "Rescheduled", tone: "#ea580c" },
+  { day: "26 Nov", time: "14:30", name: "Meera Joshi", where: "Lakeside", status: "Confirmed", tone: "#14b8a6" },
+  { day: "27 Nov", time: "10:00", name: "Arjun Das", where: "City Centre", status: "Scheduled", tone: "#6b8afd" },
+  { day: "27 Nov", time: "17:45", name: "Isha Patel", where: "Main Branch", status: "Rescheduled", tone: "#a78bfa" },
 ];
 
-function MockPanel({ title, icon: Icon, action, children }: { title: string; icon: typeof ClockIcon; action?: string; children: React.ReactNode }) {
+const MOCK_NEWEST = [
+  { name: "Rohit Mehra", detail: "Website Form · 98201 44310", when: "26 Nov, 09:12", stage: 0 },
+  { name: "Sana Sheikh", detail: "Google Ads · 99870 21543", when: "25 Nov, 18:40", stage: 1 },
+  { name: "Ankit Verma", detail: "WhatsApp · 91672 80915", when: "25 Nov, 12:05", stage: 3 },
+];
+
+const MOCK_REPEATS = [
+  { name: "Priya Nair", detail: "3 enquiries · latest via Google Ads", when: "26 Nov, 08:45" },
+  { name: "Dev Malhotra", detail: "2 enquiries · latest via Inbound Call", when: "25 Nov, 15:20" },
+  { name: "Kavya Iyer", detail: "2 enquiries · latest via WhatsApp", when: "24 Nov, 11:30" },
+];
+
+function MockBadge({ color, children }: { color: string; children: React.ReactNode }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-[#dee2e6] bg-white">
+    <span
+      className="shrink-0 rounded-md px-1.5 py-px text-[9.5px] font-semibold whitespace-nowrap"
+      style={{ color, backgroundColor: `color-mix(in oklch, ${color} 18%, transparent)` }}
+    >
+      {children}
+    </span>
+  );
+}
+
+function MockPanel({
+  title,
+  icon: Icon,
+  action,
+  className,
+  children,
+}: {
+  title: string;
+  icon: typeof ClockIcon;
+  action?: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={cn("overflow-hidden rounded-lg border border-[#dee2e6] bg-white shadow-xs", className)}>
       <div className="flex items-center justify-between border-b border-[#dee2e6] px-3.5 py-2">
         <span className="flex items-center gap-1.5 text-[12px] font-semibold">
           <Icon className="size-3.5" style={{ color: TEAL }} />
@@ -246,14 +284,7 @@ function StageDot({ color }: { color: string }) {
 }
 
 function StagePill({ stage }: { stage: (typeof MOCK_STAGES)[number] }) {
-  return (
-    <span
-      className="shrink-0 rounded-full px-1.5 py-px text-[9.5px] font-medium"
-      style={{ color: stage.color, backgroundColor: `color-mix(in oklch, ${stage.color} 14%, white)` }}
-    >
-      {stage.name}
-    </span>
-  );
+  return <MockBadge color={stage.color}>{stage.name}</MockBadge>;
 }
 
 function DashboardMockup() {
@@ -265,7 +296,7 @@ function DashboardMockup() {
     >
       <div className="hidden w-[184px] shrink-0 flex-col border-r border-[#dee2e6] bg-white md:flex">
         <div className="flex h-11 items-center gap-2 border-b border-[#dee2e6] px-3">
-          <span className="grid size-6 place-items-center rounded-md text-[9px] font-bold text-white" style={{ background: TEAL }}>
+          <span className="grid size-6 place-items-center rounded-lg text-[9px] font-bold text-white" style={{ background: TEAL }}>
             SC
           </span>
           <span className="leading-tight">
@@ -337,6 +368,7 @@ function DashboardMockup() {
                 4
               </span>
             </span>
+            <LogOutIcon className="size-3.5" />
           </span>
         </div>
 
@@ -354,7 +386,7 @@ function DashboardMockup() {
         <div className="flex flex-col gap-3 p-4">
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {MOCK_STATS.map((s) => (
-              <div key={s.label} className="rounded-lg border border-[#dee2e6] bg-white p-3">
+              <div key={s.label} className="rounded-xl border border-[#dee2e6] bg-white p-3 shadow-xs">
                 <div className="flex items-start justify-between gap-2">
                   <span className="text-[10.5px] font-medium text-[#6b7280]">{s.label}</span>
                   <span className={cn("grid size-6 place-items-center rounded-md", s.chip)}>
@@ -420,15 +452,41 @@ function DashboardMockup() {
                       <span className="block truncate text-[11.5px] font-medium">{a.name}</span>
                       <span className="block truncate text-[10px] text-[#6b7280]">{a.where}</span>
                     </span>
-                    <span
-                      className="shrink-0 rounded-full px-1.5 py-px text-[9.5px] font-medium"
-                      style={{ color: a.tone, backgroundColor: `color-mix(in oklch, ${a.tone} 14%, white)` }}
-                    >
-                      {a.status}
-                    </span>
+                    <MockBadge color={a.tone}>{a.status}</MockBadge>
                   </li>
                 ))}
               </ul>
+            </MockPanel>
+
+            <MockPanel title="Newest Leads" icon={SparklesIcon} action="View all" className="hidden sm:block">
+                <ul className="divide-y divide-[#dee2e6] px-1">
+                  {MOCK_NEWEST.map((l) => (
+                    <li key={l.name} className="flex items-center gap-2 px-2.5 py-2">
+                      <span className="min-w-0 flex-1 leading-tight">
+                        <span className="block truncate text-[11.5px] font-medium">{l.name}</span>
+                        <span className="block truncate text-[10px] text-[#6b7280]">{l.detail}</span>
+                        <span className="block text-[9.5px] text-[#6b7280]">{l.when}</span>
+                      </span>
+                      <StagePill stage={MOCK_STAGES[l.stage]} />
+                    </li>
+                  ))}
+                </ul>
+            </MockPanel>
+
+            <MockPanel title="Recent Repeat Enquiries" icon={RefreshCwIcon} className="hidden sm:block">
+                <ul className="divide-y divide-[#dee2e6] px-1">
+                  {MOCK_REPEATS.map((r) => (
+                    <li key={r.name} className="flex items-center gap-2 px-2.5 py-2">
+                      <span className="size-1.5 shrink-0 rounded-full" style={{ background: TEAL }} />
+                      <span className="min-w-0 flex-1 leading-tight">
+                        <span className="block truncate text-[11.5px] font-medium">{r.name}</span>
+                        <span className="block truncate text-[10px] text-[#6b7280]">{r.detail}</span>
+                        <span className="block text-[9.5px] text-[#6b7280]">{r.when}</span>
+                      </span>
+                      <MockBadge color="#f97316">Re-enquiry</MockBadge>
+                    </li>
+                  ))}
+                </ul>
             </MockPanel>
           </div>
         </div>

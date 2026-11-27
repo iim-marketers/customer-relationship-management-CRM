@@ -71,7 +71,7 @@ export default function SignupPage() {
 
       <section className="flex items-center justify-center px-4 py-8 sm:px-8 lg:overflow-y-auto lg:py-6">
         <div className="w-full max-w-xl">
-          <BrandMark className="mb-6 text-lg lg:hidden" />
+          <BrandMark className="mb-6 text-2xl lg:hidden" />
           <div className="mb-6">
             <h2 className="text-2xl font-bold tracking-tight">
               Create your account
