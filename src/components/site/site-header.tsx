@@ -8,7 +8,11 @@ import { cn } from "@/lib/utils";
 
 export function Wordmark({ className }: { className?: string }) {
   return (
-    <Link href="/" aria-label="CRM home" className={cn("flex text-[24px]", className)}>
+    <Link
+      href="/"
+      aria-label="CRM home"
+      className={cn("flex text-[24px]", className)}
+    >
       <Logo />
     </Link>
   );
@@ -28,7 +32,9 @@ function useScrollHeader(revealOffset = 64, jitter = 6) {
       lastY.current = y;
       const atTop = y <= 4;
       const hidden = !atTop && delta > 0 && y > revealOffset;
-      setState((s) => (s.atTop === atTop && s.hidden === hidden ? s : { atTop, hidden }));
+      setState((s) =>
+        s.atTop === atTop && s.hidden === hidden ? s : { atTop, hidden },
+      );
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
@@ -60,16 +66,19 @@ export function SiteHeader() {
       <div className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-3.5 sm:px-6">
         <Wordmark />
         <div className="ml-auto flex items-center gap-2">
-          <ThemeToggle />
-          <Link href="/login" className="rounded-md px-3 py-2 text-[15px] font-medium text-foreground hover:text-[#0f766e] dark:hover:text-primary">
+          <Link
+            href="/login"
+            className="rounded-md border border-[#0f766e]/35 bg-white px-4 py-2 text-sm font-medium whitespace-nowrap text-[#0f766e] shadow-sm transition hover:border-[#0f766e] hover:bg-[#f0fdfa] dark:border-primary/40 dark:bg-transparent dark:text-primary dark:hover:border-primary dark:hover:bg-primary/10"
+          >
             Sign in
           </Link>
           <Link
             href="/signup"
-            className="rounded-md border border-[#115e59] bg-[#0f766e] px-4 py-2 text-sm font-medium whitespace-nowrap text-white shadow-sm transition hover:bg-[#115e59]"
+            className="hidden rounded-md border border-[#115e59] bg-[#0f766e] px-4 py-2 md:block text-sm font-medium whitespace-nowrap text-white shadow-sm transition hover:bg-[#115e59]"
           >
             Get started
           </Link>
+          <ThemeToggle className="ml-0 md:ml-2" />
         </div>
       </div>
     </header>

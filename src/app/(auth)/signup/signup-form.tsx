@@ -5,6 +5,7 @@ import {
   CheckCircle2Icon,
   Loader2Icon,
   XCircleIcon,
+  XIcon,
 } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
 import { checkUsername, signUp, type AuthState } from "@/app/(auth)/actions";
@@ -136,21 +137,33 @@ export function SignupForm() {
               </span>
             </Label>
             <input type="hidden" name="industry" value={values.industry} />
-            <Select value={values.industry} onValueChange={set("industry")}>
-              <SelectTrigger
-                id="industry-trigger"
-                className="w-full data-[size=default]:h-10"
-              >
-                <SelectValue placeholder="Choose one" />
-              </SelectTrigger>
-              <SelectContent>
-                {INDUSTRIES.map((i) => (
-                  <SelectItem key={i.value} value={i.value}>
-                    {i.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="relative">
+              <Select value={values.industry} onValueChange={set("industry")}>
+                <SelectTrigger
+                  id="industry-trigger"
+                  className="w-full data-[size=default]:h-10"
+                >
+                  <SelectValue placeholder="Choose one" />
+                </SelectTrigger>
+                <SelectContent>
+                  {INDUSTRIES.map((i) => (
+                    <SelectItem key={i.value} value={i.value}>
+                      {i.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {values.industry && (
+                <button
+                  type="button"
+                  aria-label="Clear industry"
+                  onClick={() => set("industry")("")}
+                  className="absolute top-1/2 right-8 grid size-6 -translate-y-1/2 place-items-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                >
+                  <XIcon className="size-3.5" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </fieldset>

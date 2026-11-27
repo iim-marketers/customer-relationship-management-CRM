@@ -69,13 +69,15 @@ export default function SignupPage() {
         <div aria-hidden className="h-8" />
       </aside>
 
-      <section className="flex items-center justify-center px-4 py-8 sm:px-8 lg:overflow-y-auto lg:py-6">
+      <section className="flex items-center justify-center px-4 pb-8 sm:px-8 sm:pt-8 lg:overflow-y-auto lg:py-6">
         <div className="w-full max-w-xl">
-          <BrandMark className="mb-6 text-2xl lg:hidden" />
           <div className="mb-6">
-            <h2 className="text-2xl font-bold tracking-tight">
-              Create your account
-            </h2>
+            <div className="flex items-center gap-3">
+              <BrandMark className="text-2xl lg:hidden" />
+              <h2 className="text-2xl font-bold tracking-tight">
+                Create your account
+              </h2>
+            </div>
             <p className="mt-1 text-sm text-muted-foreground">
               You&apos;ll land in your new dashboard right after.
             </p>
